@@ -1,0 +1,51 @@
+name: Release Changelog
+
+# Trigger on any pushed tag matching vMAJOR.MINOR.PATCH (e.g. v1.2.3)
+# and also once per week (Sunday at midnight UTC)
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  schedule:
+    - cron: "0 0 * * 0"
+
+permissions:
+  contents: write # allow the workflow to push commits back
+
+jobs:
+  update-changelog:
+    name: Generate & Commit CHANGELOG
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Fetch full git history so git-changelog can see all commits
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Install your tools
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install git-changelog
+        run: pip install git-changelog
+
+      # 3. Generate or update CHANGELOG.md in-place, using pyproject.toml config
+      - name: Update CHANGELOG
+        run: git-changelog
+
+      # 4. Commit & push if there are changes
+      - name: Commit changelog
+        run: |
+          # Only commit if CHANGELOG.md was modified
+          if [[ -n "$(git status --porcelain CHANGELOG.md)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add CHANGELOG.md
+            git commit -m "docs: bump changelog for ${{ github.ref }}"
+            git push
+          else
+            echo "No changes to CHANGELOG.md, skipping commit."
+          fi
