@@ -1,0 +1,10 @@
+# Virtual env
+venv/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Env files
+.env
+EOF
