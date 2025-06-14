@@ -25,12 +25,11 @@ def run_scrape(companies=None):
     summary = {}
 
     # 2. Determine target companies
-    all_insts = load_institutions_config()
-    inst_names = [inst["name"] for inst in all_insts]
-
     if companies:
         targets = companies
     else:
+        all_insts = load_institutions_config()
+        inst_names = [inst["name"] for inst in all_insts]
         targets = inst_names
 
     # 3. Loop and scrape
