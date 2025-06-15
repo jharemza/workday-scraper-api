@@ -97,71 +97,14 @@ def run_institution_scraper(institution: dict):
             facet_param, loc_id = find_id_by_descriptor(facets, loc)
             if loc_id:
                 location_ids.append(loc_id)
-                print(f"\n{company_name}: For {loc} found match {loc_id}")
             else:
                 log_with_prefix("error", company_name, f"Location '{loc}' not found in facets.")
-                print(f"{company_name}: For {loc} no match found in facets.")
 
     if locations and not location_ids:
         log_with_prefix("warning", company_name, f"No valid location IDs matched descriptors. Skipping.")
-        print(f"No valid location IDs matched descriptors. Skipping.")
         return []
 
     # 3. Job collection
-#    offset = 0
-#    limit = 20
-#    job_urls = []
-#    page_pbar = tqdm(desc=f"{company_name}: Pages scraped", unit="page")
-#
-#    while True:
-#
-#        applied_facets = {}
-#        if location_ids:
-#            applied_facets["locations"] = location_ids
-#
-#
-#        job_payload = {
-#            "limit": limit,
-#            "offset": offset,
-#            "appliedFacets": applied_facets,
-#            "searchText": search_text
-#        }
-#
-#        try:
-#            response = requests.post(url, json=job_payload, headers={"Content-Type": "application/json"})
-#            response.raise_for_status()
-#        except Exception as e:
-#            log_with_prefix("error", company_name, f"Pagination request failed: {e}")
-#            break
-#
-#        jobs = response.json().get("jobPostings", [])
-#        ljobs = len(jobs)
-#        print("This is the list called jobs:\n")
-#        print(jobs)
-#        print(f"The length of jobs is: {ljobs}")
-#        jobs_data = [
-#            f"{url.rsplit('/jobs', 1)[0]}/job/{job.get('externalPath', '').split('/')[-1]}"
-#            for job in jobs if "externalPath" in job
-#        ]
-#        ljobs_data = len(jobs_data)
-#        print("This is the list called jobs_data:")
-#        print(jobs_data)
-#        print(f"The length of jobs_data is: {ljobs_data}")
-#
-#        if not jobs_data:
-#            break
-#
-#        job_urls.extend(jobs_data)
-#        print(f"The current run has an offset of {offset} and a limit of {limit}.")
-#        offset += limit
-#        print(f"The next run will have an offset of {offset} and a limit of {limit}.")
-#        print(f"If the length of jobs ({ljobs}) is less than the limit ({limit}), then the loop breaks.")
-#        page_pbar.update(1)
-#
-#        if len(jobs) < limit:
-#            break
-#
-#        time.sleep(0.5)
 
     # Initial variables
     offset = 0
@@ -204,10 +147,7 @@ def run_institution_scraper(institution: dict):
     job_urls.extend(first_jobs_data)
     
     page_pbar.update(1)
-    print(f"page_pbar.n = {page_pbar.n}")
-    print(f"The intial offset is {offset} and the initial limit is {limit}.")
     offset += limit
-    print(f"The incremented offset before the loop is {offset} and the incremented limit before the loop is {limit}.")
 
     # Loop through the *remaining* pages
     while page_pbar.n < total_pages:
@@ -238,7 +178,6 @@ def run_institution_scraper(institution: dict):
         job_urls.extend(jobs_data)
 
         offset += limit
-        print(f"The incremented offset inside the loop is {offset} and the incremented limit inside the loop is {limit}.")
         page_pbar.update(1)
         time.sleep(0.5)
 

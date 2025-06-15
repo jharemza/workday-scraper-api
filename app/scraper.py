@@ -77,9 +77,7 @@ def run_scrape(companies=None):
             # salary parsing
             from app.scraper_pkg.institution_runner import extract_salary_range
             salary_low, salary_high = extract_salary_range(desc)
-    
-            print(f"company: {company}\nwid: {wid}\ntitle: {title}\ndesc: {desc}\nloc: {loc}\nurl: {url}\nposted_on: {posted_on}\nstart_date: {start_date}\ntime_type: {time_type}\nreq_id: {req_id}\npost_id: {post_id}\nsite_id: {site_id}\ncountry: {country}\nlogo: {logo}\ncan_apply: {can_apply}\nposted: {posted}\ninclude_resume: {include_resume}\njob_loc: {job_loc}\nremote: {remote}\nq_id: {q_id}\nsalary_low: {salary_low}\nsalary_high: {salary_high}")
-        
+           
             if wid not in existing:
                 insert_job_posting(
                     company,
