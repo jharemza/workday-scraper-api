@@ -8,6 +8,7 @@ from app.db import (
 )
 from app.scraper_pkg.config_loader import load_institutions_config
 from app.scraper_pkg.institution_runner import run_institution_scraper
+from tqdm import tqdm
 
 def run_scrape(companies=None):
     """
@@ -112,6 +113,11 @@ def run_scrape(companies=None):
                 delete_job_posting(company, old_id)
                 deleted += 1
     
-            summary[company] = {"inserted": inserted, "deleted": deleted}
+            skipped = len(jobs) - inserted - deleted
 
-    return summary
+        tqdm.write(f"\n📊 {company} Summary:")
+        tqdm.write(f"  ✅ Inserted: {inserted}")
+        tqdm.write(f"  🟡 Skipped : {skipped}")
+        tqdm.write(f"  🔴 Deleted : {deleted}")
+        tqdm.write(f"  📦 Total   : {len(jobs)}")
+        

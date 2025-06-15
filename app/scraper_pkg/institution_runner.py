@@ -201,12 +201,4 @@ def run_institution_scraper(institution: dict):
 
         time.sleep(0.5)
 
-    success, skipped, failed = 0, 0, 0
-
-    tqdm.write(f"\n📊 {company_name} Summary:")
-    tqdm.write(f"  ✅ Uploaded: {success}")
-    tqdm.write(f"  🟡 Skipped : {skipped}")
-    tqdm.write(f"  🔴 Failed  : {failed}")
-    tqdm.write(f"  📦 Total   : {len(job_postings)}")
-
     return job_postings
