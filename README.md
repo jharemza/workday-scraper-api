@@ -173,3 +173,65 @@ This project is licensed under the [MIT License](LICENSE).
 ```makefile
 ::contentReference[oaicite:1]{index=1}
 ```
+
+## Example Requests
+
+You can interact with the API directly via `curl` or import these into Postman.
+
+---
+
+### Using `curl`
+
+> Replace `{{API_HOST}}` and `{{API_PORT}}` with your configured values (defaults: `127.0.0.1:5000`).
+
+1. **List all jobs**
+
+```bash
+curl -X GET http://{{API_HOST}}:{{API_PORT}}/jobs/all
+```
+
+2. **Jobs scraped today**
+
+```bash
+curl -X GET http://{{API_HOST}}:{{API_PORT}}/jobs/today
+```
+
+3. **All current jobs for a company**
+
+```bash
+curl -X GET http://{{API_HOST}}:{{API_PORT}}/jobs/company/"M&T%20Bank"
+```
+
+4. **New jobs for a company (added today)**
+
+```bash
+curl -X GET http://{{API_HOST}}:{{API_PORT}}/jobs/company/"M&T%20Bank"/new
+```
+
+5. **Trigger a scrape for one or more companies**
+
+```bash
+curl -X POST http://{{API_HOST}}:{{API_PORT}}/jobs/scrape \
+  -H "Content-Type: application/json" \
+  -d '{"companies": ["M&T Bank", "Acme Corp"]}'
+```
+
+---
+
+### Using Postman
+
+1. Create a new Collection called “Workday Scraper API”.
+2. Add a Request for each endpoint:
+
+   - Method: GET or POST
+   - URL: `http://127.0.0.1:5000/jobs/all` (or other endpoints)
+   - Headers: for POST, set `Content-Type: application/json`
+   - Body (raw JSON) for `/jobs/scrape`:
+
+     ```json
+     {
+       "companies": ["M&T Bank", "Acme Corp"]
+     }
+     ```
+
+3. Save and Send—you’ll see the JSON response in Postman’s response pane.
