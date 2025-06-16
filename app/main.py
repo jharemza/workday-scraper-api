@@ -41,8 +41,31 @@ from app.routes import jobs_bp
 
 def create_app():
     app = Flask(__name__)
+
     init_db() # ensure table exists
     app.register_blueprint(jobs_bp)
+
+    #–– HTTP exceptions (400, 404, etc) ––
+    from werkzeug.exceptions import HTTPException
+    from flask import jsonify, current_app
+
+    @app.errorhandler(HTTPException)
+    def handle_http_error(e):
+        current_app.logger.warning(f"HTTP error {e.code}: {e.description}")
+        return jsonify({
+            "error": e.name,
+            "message": e.description
+        }), e.code
+
+    #–– All other uncaught exceptions ––
+    @app.errorhandler(Exception)
+    def handle_unexpected_error(e):
+        current_app.logger.exception("Unhandled exception")
+        return jsonify({
+            "error": "Internal Server Error",
+            "message": "An unexpected error occurred."
+        }), 500
+
     return app
 
 if __name__ == "__main__":

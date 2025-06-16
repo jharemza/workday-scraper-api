@@ -8,3 +8,6 @@ __pycache__/
 # Env files
 .env
 EOF
+
+# Log file output
+logs/*.log
