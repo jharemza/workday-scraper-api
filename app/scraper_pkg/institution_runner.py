@@ -4,6 +4,7 @@ import time
 import re
 from tqdm import tqdm
 import math
+import app.config as config
 
 def find_id_by_descriptor(facets, target_descriptor):
     """
@@ -76,7 +77,7 @@ def run_institution_scraper(institution: dict):
 
     # 2. Initial fetch for facets
     initial_payload = {
-        "limit": 1,
+        "limit": config.FACET_LIMIT,
         "offset": 0,
         "appliedFacets": {},
         "searchText": ""
@@ -108,7 +109,7 @@ def run_institution_scraper(institution: dict):
 
     # Initial variables
     offset = 0
-    limit = 20
+    limit = config.SCRAPE_LIMIT
     job_urls = []
 
     applied_facets = {}

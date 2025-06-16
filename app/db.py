@@ -2,10 +2,10 @@
 
 import sqlite3
 from datetime import date
-from app.config import DB_PATH
+from app.config import JOBS_DB_PATH
 
 def _connect():
-    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn = sqlite3.connect(JOBS_DB_PATH, timeout=10)
     conn.row_factory = sqlite3.Row
     return conn
 

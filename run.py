@@ -4,6 +4,7 @@ import click
 from app.main import create_app
 from app.scraper import run_scrape
 from app.scraper_pkg.config_loader import load_institutions_config
+import app.config as config
 
 @click.group()
 def cli():
@@ -28,8 +29,8 @@ def scrape(companies):
     click.echo(result)
 
 @cli.command()
-@click.option("--host", default="127.0.0.1", help="Host to bind the API server to.")
-@click.option("--port", default=5000, type=int, help="Port for the API server.")
+@click.option("--host", default=config.API_HOST, help="Host to bind the API server to.")
+@click.option("--port", default=config.API_PORT, type=int, help="Port for the API server.")
 def serve(host, port):
     """
     Launch the Flask API.
