@@ -37,3 +37,13 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+      - name: Run flake8 linter
+        run: |
+          pip install flake8
+          flake8 app tests
+
+      - name: Run black formatter check
+        run: |
+          pip install black
+          black --check app tests
