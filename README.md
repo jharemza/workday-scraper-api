@@ -1,5 +1,7 @@
 # workday-scraper-api
 
+![CI](https://github.com/jharemza/workday-scraper-api/actions/workflows/ci.yml/badge.svg?branch=main)
+
 Flask API service for automated job scraping with database backend :contentReference[oaicite:0]{index=0}
 
 ## Table of Contents
