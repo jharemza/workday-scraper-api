@@ -8,7 +8,7 @@ from institution_runner import run_institution_scraper
 # --- Logging Setup ---
 # Create rotating file handler (max 5MB per file, keep 5 backups)
 file_handler = RotatingFileHandler(
-    "scraper.log", maxBytes=5_000_000, backupCount=5, encoding='utf-8'
+    "scraper.log", maxBytes=5_000_000, backupCount=5, encoding="utf-8"
 )
 file_handler.setLevel(logging.INFO)  # or DEBUG for full verbosity
 
@@ -29,9 +29,7 @@ logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 
 # --- Configurations ---
-HEADERS = {
-    "Content-Type": "application/json"
-}
+HEADERS = {"Content-Type": "application/json"}
 
 # --- Main Execution ---
 if __name__ == "__main__":
@@ -44,7 +42,7 @@ if __name__ == "__main__":
         # Write full job response to file. One file per institution.
         safe_name = institution["name"].replace(" ", "_").replace("&", "and")
         filename = f"json_output/workday_response_{safe_name}.json"
-    
-        with open(filename, 'w', encoding='utf-8') as f:
+
+        with open(filename, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=4)
         logging.info(f"Filtered job response saved to {filename}")

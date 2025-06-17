@@ -10,6 +10,7 @@ from app.scraper_pkg.config_loader import load_institutions_config
 from app.scraper_pkg.institution_runner import run_institution_scraper
 from tqdm import tqdm
 
+
 def run_scrape(companies=None):
     """
     1. Ensure the DB schema exists.
@@ -22,8 +23,6 @@ def run_scrape(companies=None):
     """
     # 1. Bootstrap DB
     init_db()
-
-    summary = {}
 
     # 2. Determine target companies
     all_insts = load_institutions_config()
@@ -58,7 +57,9 @@ def run_scrape(companies=None):
             wid = job["id"]
             title = job.get("title")
             desc = job.get("jobDescription")
-            loc = job.get("jobRequisitionLocation", {}).get("descriptor") or job.get("location", {}).get("descriptor")
+            loc = job.get("jobRequisitionLocation", {}).get("descriptor") or job.get(
+                "location", {}
+            ).get("descriptor")
             url = job.get("externalUrl") or job.get("url")
             posted_on = job.get("postedOn")
             start_date = job.get("startDate")
@@ -74,11 +75,12 @@ def run_scrape(companies=None):
             job_loc = job.get("jobRequisitionLocation", {}).get("descriptor")
             remote = job.get("remoteType")
             q_id = job.get("questionnaireId")
-        
+
             # salary parsing
             from app.scraper_pkg.institution_runner import extract_salary_range
+
             salary_low, salary_high = extract_salary_range(desc)
-           
+
             if wid not in existing:
                 insert_job_posting(
                     company,
@@ -102,17 +104,16 @@ def run_scrape(companies=None):
                     remote,
                     q_id,
                     salary_low,
-                    salary_high
+                    salary_high,
                 )
                 inserted += 1
-    
-    
+
             # 3e. Delete stale postings
             deleted = 0
             for old_id in existing - scraped:
                 delete_job_posting(company, old_id)
                 deleted += 1
-    
+
             skipped = len(jobs) - inserted - deleted
 
         tqdm.write(f"\n📊 {company} Summary:")
@@ -120,4 +121,3 @@ def run_scrape(companies=None):
         tqdm.write(f"  🟡 Skipped : {skipped}")
         tqdm.write(f"  🔴 Deleted : {deleted}")
         tqdm.write(f"  📦 Total   : {len(jobs)}")
-        

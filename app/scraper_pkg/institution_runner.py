@@ -6,9 +6,11 @@ from tqdm import tqdm
 import math
 import app.config as config
 
+
 def find_id_by_descriptor(facets, target_descriptor):
     """
-    Recursively find the ID and facetParameter for a given descriptor across Workday facetParameters.
+    Recursively find the ID and facetParameter for a given descriptor
+    across Workday facetParameters.
 
     Args:
         facets (list): The facets list loaded from JSON.
@@ -33,8 +35,13 @@ def find_id_by_descriptor(facets, target_descriptor):
                 nested_values = value["values"]
 
                 found_facet_parameter, found_id = find_id_by_descriptor(
-                    [{"facetParameter": nested_facet_parameter, "values": nested_values}],
-                    target_descriptor
+                    [
+                        {
+                            "facetParameter": nested_facet_parameter,
+                            "values": nested_values,
+                        }
+                    ],
+                    target_descriptor,
                 )
 
                 if found_id:
@@ -42,11 +49,14 @@ def find_id_by_descriptor(facets, target_descriptor):
 
     return None, None
 
+
 def extract_salary_range(description):
     """
     Extracts salary range (low, high) as floats from jobDescription HTML text.
     """
-    match = re.search(r"\$([\d,]+(?:\.\d{2})?)\s*-\s*\$([\d,]+(?:\.\d{2})?)", description)
+    match = re.search(
+        r"\$([\d,]+(?:\.\d{2})?)\s*-\s*\$([\d,]+(?:\.\d{2})?)", description
+    )
     if match:
         low_str = match.group(1).replace(",", "")
         high_str = match.group(2).replace(",", "")
@@ -55,14 +65,18 @@ def extract_salary_range(description):
             high = float(high_str)
             return low, high
         except ValueError:
-            logging.debug(f"Float conversion failed: low='{low_str}', high='{high_str}'")
+            logging.debug(
+                f"Float conversion failed: low='{low_str}', high='{high_str}'"
+            )
             return None, None
     else:
         logging.debug("Salary pattern not found in job description.")
         return None, None
 
+
 def log_with_prefix(level, company_name, message):
     getattr(logging, level)(f"[{company_name}] {message}")
+
 
 def run_institution_scraper(institution: dict):
     """Run scraping for a single institution."""
@@ -73,18 +87,20 @@ def run_institution_scraper(institution: dict):
     search_text = institution["search_text"]
     company_name = institution["name"]
 
-    log_with_prefix("info", company_name, f"🏁 Starting scrape.")
+    log_with_prefix("info", company_name, "🏁 Starting scrape.")
 
     # 2. Initial fetch for facets
     initial_payload = {
         "limit": config.FACET_LIMIT,
         "offset": 0,
         "appliedFacets": {},
-        "searchText": ""
+        "searchText": "",
     }
 
     try:
-        response = requests.post(url, json=initial_payload, headers={"Content-Type": "application/json"})
+        response = requests.post(
+            url, json=initial_payload, headers={"Content-Type": "application/json"}
+        )
         response.raise_for_status()
     except Exception as e:
         log_with_prefix("error", company_name, f"Failed to fetch facets: {e}")
@@ -99,10 +115,16 @@ def run_institution_scraper(institution: dict):
             if loc_id:
                 location_ids.append(loc_id)
             else:
-                log_with_prefix("error", company_name, f"Location '{loc}' not found in facets.")
+                log_with_prefix(
+                    "error", company_name, f"Location '{loc}' not found in facets."
+                )
 
     if locations and not location_ids:
-        log_with_prefix("warning", company_name, f"No valid location IDs matched descriptors. Skipping.")
+        log_with_prefix(
+            "warning",
+            company_name,
+            "No valid location IDs matched descriptors. Skipping.",
+        )
         return []
 
     # 3. Job collection
@@ -118,35 +140,40 @@ def run_institution_scraper(institution: dict):
 
     # First request to discover total jobs
     job_payload = {
-            "limit": limit,
-            "offset": offset,
-            "appliedFacets": applied_facets,
-            "searchText": search_text
-        }
-    
+        "limit": limit,
+        "offset": offset,
+        "appliedFacets": applied_facets,
+        "searchText": search_text,
+    }
+
     try:
-        response = requests.post(url, json=job_payload, headers={"Content-Type": "application/json"})
+        response = requests.post(
+            url, json=job_payload, headers={"Content-Type": "application/json"}
+        )
         response.raise_for_status()
     except Exception as e:
         log_with_prefix("error", company_name, f"Pagination request failed: {e}")
 
-    # Compute how many pages to expect    
+    # Compute how many pages to expect
     data = response.json()
     jobs_first_batch = data.get("jobPostings", [])
     total = data.get("total", 0)
     total_pages = math.ceil(total / limit)
 
     # Initialize your progress bar with known total_pages
-    page_pbar = tqdm(desc=f"{company_name}: Pages scraped", unit="page", total=total_pages)
+    page_pbar = tqdm(
+        desc=f"{company_name}: Pages scraped", unit="page", total=total_pages
+    )
 
     # Collect URLs from first batch
     first_jobs_data = [
-            f"{url.rsplit('/jobs', 1)[0]}/job/{job.get('externalPath', '').split('/')[-1]}"
-            for job in jobs_first_batch if "externalPath" in job
-        ]
+        f"{url.rsplit('/jobs', 1)[0]}/job/{job.get('externalPath', '').split('/')[-1]}"
+        for job in jobs_first_batch
+        if "externalPath" in job
+    ]
 
     job_urls.extend(first_jobs_data)
-    
+
     page_pbar.update(1)
     offset += limit
 
@@ -154,14 +181,16 @@ def run_institution_scraper(institution: dict):
     while page_pbar.n < total_pages:
 
         job_payload = {
-                    "limit": limit,
-                    "offset": offset,
-                    "appliedFacets": applied_facets,
-                    "searchText": search_text
-                }
-        
+            "limit": limit,
+            "offset": offset,
+            "appliedFacets": applied_facets,
+            "searchText": search_text,
+        }
+
         try:
-            response = requests.post(url, json=job_payload, headers={"Content-Type": "application/json"})
+            response = requests.post(
+                url, json=job_payload, headers={"Content-Type": "application/json"}
+            )
             response.raise_for_status()
         except Exception as e:
             log_with_prefix("error", company_name, f"Pagination request failed: {e}")
@@ -170,7 +199,8 @@ def run_institution_scraper(institution: dict):
         jobs = response.json().get("jobPostings", [])
         jobs_data = [
             f"{url.rsplit('/jobs', 1)[0]}/job/{job.get('externalPath', '').split('/')[-1]}"
-            for job in jobs if "externalPath" in job
+            for job in jobs
+            if "externalPath" in job
         ]
 
         if not jobs_data:
@@ -190,7 +220,11 @@ def run_institution_scraper(institution: dict):
 
     # 4. Job detail collection
     job_postings = []
-    for idx, url in tqdm(enumerate(job_urls), total=len(job_urls), desc=f"{company_name}: Fetching job data"):
+    for idx, url in tqdm(
+        enumerate(job_urls),
+        total=len(job_urls),
+        desc=f"{company_name}: Fetching job data",
+    ):
         try:
             response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
             response.raise_for_status()
@@ -198,7 +232,9 @@ def run_institution_scraper(institution: dict):
             if job_data:
                 job_postings.append(job_data)
         except Exception as e:
-            log_with_prefix("error", company_name, f"Fetch job detail failed ({url}): {e}")
+            log_with_prefix(
+                "error", company_name, f"Fetch job detail failed ({url}): {e}"
+            )
 
         time.sleep(0.5)
 

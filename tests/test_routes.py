@@ -1,9 +1,11 @@
 import requests
 
+
 def test_jobs_all(base_url):
     res = requests.get(f"{base_url}/jobs/all")
     assert res.status_code == 200
     assert isinstance(res.json(), list)
+
 
 def test_scrape_route(base_url):
     # Replace this with one of your configured institutions
