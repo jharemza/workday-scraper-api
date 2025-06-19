@@ -1,0 +1,109 @@
+{
+  "info": {
+    "name": "Workday Scraper API",
+    "description": "API to scrape job postings from Workday-based career pages.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "0.1.0"
+  },
+  "item": [
+    {
+      "name": "Get All Jobs",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5000/jobs/all",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["jobs", "all"]
+        }
+      }
+    },
+    {
+      "name": "Get today's jobs",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5000/jobs/today",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["jobs", "today"]
+        }
+      }
+    },
+    {
+      "name": "Get jobs for a specific company via URL param",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5000/jobs/company/{company}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["jobs", "company", "{company}"]
+        }
+      }
+    },
+    {
+      "name": "Get new jobs for a specific company",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5000/jobs/company/{company}/new",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["jobs", "company", "{company}", "new"]
+        }
+      }
+    },
+    {
+      "name": "Scrape Jobs",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"companies\": [\"M&T Bank\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/jobs/scrape",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["jobs", "scrape"]
+        }
+      }
+    }
+  ]
+}

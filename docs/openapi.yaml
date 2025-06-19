@@ -1,0 +1,137 @@
+openapi: 3.1.1
+info:
+  title: Workday Scraper API
+  description: API to scrape job postings from Workday-based career pages.
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+paths:
+  /jobs/all:
+    get:
+      summary: Get all job postings
+      operationId: getAllJobs
+      responses:
+        "200":
+          description: A list of job postings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+
+  /jobs/today:
+    get:
+      summary: Get today's jobs
+      operationId: getTodaysJobs
+      description: Returns all jobs posted today across all companies.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+
+  /jobs/company/{company}:
+    get:
+      summary: Get jobs for a specific company via URL param
+      operationId: getCompanyJobsByParam
+      parameters:
+        - name: company
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of jobs for the specified company
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+
+  /jobs/company/{company}/new:
+    get:
+      summary: Get new jobs for a specific company
+      operationId: getNewJobsForCompany
+      parameters:
+        - name: company
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: New jobs for the specified company
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+
+  /jobs/scrape:
+    post:
+      summary: Trigger scraping for one or more companies
+      operationId: scrapeJobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                companies:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - companies
+            example:
+              companies:
+                - M&T Bank
+      responses:
+        "202":
+          description: Scrape initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scraped:
+                    type:
+                    items:
+                      type: string
+                example:
+                  scraped:
+                    - M&T Bank
+        "400":
+          description: Invalid input
+
+components:
+  schemas:
+    Job:
+      type: object
+      properties:
+        job_id:
+          type: string
+        title:
+          type: string
+        location:
+          type: string
+        date_posted:
+          type: string
+          format: date
+        company:
+          type: string
+        url:
+          type: string
+          format: uri
