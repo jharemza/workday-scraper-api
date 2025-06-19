@@ -3,7 +3,13 @@
 ![CI](https://github.com/jharemza/workday-scraper-api/actions/workflows/ci.yml/badge.svg?branch=main)
 [![codecov](https://codecov.io/gh/jharemza/workday-scraper-api/graph/badge.svg?token=2LVILJXLMF)](https://codecov.io/gh/jharemza/workday-scraper-api)
 
-Flask API service for automated job scraping with database backend :contentReference[oaicite:0]{index=0}
+Flask API service for automated job scraping with database backend
+
+## 📖 API Documentation
+
+The OpenAPI Swagger UI for this API is available at:
+
+👉 [View the API Docs](https://jharemza.github.io/workday-scraper-api/)
 
 ## Table of Contents
 
@@ -23,8 +29,8 @@ Flask API service for automated job scraping with database backend :contentRefer
 - [CI/CD](#cicd)
 - [License](#license)
 - [Example Requests](#example-requests)
-  - [Using Curl][def2]
-  - [Using Postman][def]
+  - [Using Curl](#using-curl)
+  - [Using Postman](#using-postman)
 
 ## Features
 
