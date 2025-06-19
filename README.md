@@ -22,6 +22,9 @@ Flask API service for automated job scraping with database backend :contentRefer
 - [Testing](#testing)
 - [CI/CD](#cicd)
 - [License](#license)
+- [Example Requests](#example-requests)
+  - [Using Curl][def2]
+  - [Using Postman][def]
 
 ## Features
 
@@ -238,3 +241,6 @@ curl -X POST http://{{API_HOST}}:{{API_PORT}}/jobs/scrape \
      ```
 
 3. Save and Send—you’ll see the JSON response in Postman’s response pane.
+
+[def]: #using-postman
+[def2]: #using-curl
