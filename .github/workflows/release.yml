@@ -49,3 +49,11 @@ jobs:
           else
             echo "No changes to CHANGELOG.md, skipping commit."
           fi
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "Release ${{ github.ref_name }}" \
+            --notes-file CHANGELOG.md
