@@ -182,10 +182,6 @@ pytest --cov=app tests/
 
 This project is licensed under the [MIT License](LICENSE).
 
-```makefile
-::contentReference[oaicite:1]{index=1}
-```
-
 ## Example Requests
 
 You can interact with the API directly via `curl` or import these into Postman.
@@ -247,6 +243,3 @@ curl -X POST http://{{API_HOST}}:{{API_PORT}}/jobs/scrape \
      ```
 
 3. Save and Send—you’ll see the JSON response in Postman’s response pane.
-
-[def]: #using-postman
-[def2]: #using-curl
