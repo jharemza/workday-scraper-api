@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Docs
 
+- bump changelog for refs/tags/v0.1.0 ([061dede](https://github.com/jharemza/workday-scraper-api/commit/061dedea7afa5a9b2fd5961d7e7d1db33ec42a52) by github-actions[bot]).
 - added Swagg UI documentation llink to README.md ([2d0f89e](https://github.com/jharemza/workday-scraper-api/commit/2d0f89e4b89054dbcdc92d2426190449355850cc) by Jeremiah Haremza).
 - add Swagger UI deployment for OpenAPI docs via GitHub Pages ([3c77b17](https://github.com/jharemza/workday-scraper-api/commit/3c77b17e34535ba98b0e50e84ba6a8c5c253b662) by Jeremiah Haremza).
 - add curl usage examples for all API endpoints in README ([760f3f6](https://github.com/jharemza/workday-scraper-api/commit/760f3f63fd0d203a4e033b640a863bcf08fef984) by Jeremiah Haremza).
