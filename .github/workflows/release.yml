@@ -43,6 +43,18 @@ jobs:
         run: |
           git-changelog
 
+          # Extract the latest version block
+          awk '
+            /^## \[v?[0-9]+\.[0-9]+\.[0-9]+\]/ { if (++i == 2) exit } i == 1 { print }
+          ' CHANGELOG.md > LATEST_CHANGELOG.md
+
+          # Check if it contains any section headers (###) or bullet points (-)
+          if ! grep -Eq '^(### |- )' LATEST_CHANGELOG.md; then
+            echo "⚠️ Changelog update skipped: latest version section is empty."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           # Only commit if CHANGELOG.md was modified
           if [[ -n "$(git status --porcelain CHANGELOG.md)" ]]; then
           git config user.name "github-actions[bot]"
@@ -62,6 +74,7 @@ jobs:
       # 5. Tag version if valid & new version in CHANGELOG.md
       - name: Tag version
         id: tag
+        if: steps.changelog.outputs.skip != 'true'
         run: |
           VERSION=${{ steps.changelog.outputs.version }}
 
@@ -81,6 +94,7 @@ jobs:
       # 6. Create a release based on newly generated tag
       - name: Extract latest changelog section
         id: changelog_section
+        if: steps.changelog.outputs.skip != 'true'
         run: |
           awk '/^## \[v?[0-9]+\.[0-9]+\.[0-9]+/{i++} i==1' CHANGELOG.md > LATEST_CHANGELOG.md
 
