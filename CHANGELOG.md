@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.3](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.3) - 2025-06-30
+
+<small>[Compare with v0.1.2](https://github.com/jharemza/workday-scraper-api/compare/v0.1.2...v0.1.3)</small>
+
+## [v0.1.2](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.2) - 2025-06-30
+
+<small>[Compare with v0.1.1](https://github.com/jharemza/workday-scraper-api/compare/v0.1.1...v0.1.2)</small>
+
+### Docs
+
+- add test file to trigger changelog ([787915b](https://github.com/jharemza/workday-scraper-api/commit/787915b7722bee3ba10702f2bf64351679fce883) by Jeremiah Haremza).
+
 ## [v0.1.1](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.1) - 2025-06-22
 
 <small>[Compare with v0.1.0](https://github.com/jharemza/workday-scraper-api/compare/v0.1.0...v0.1.1)</small>
@@ -60,4 +72,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Tests
 
 - add pytest config and initial test for /jobs/scrape route ([9da3637](https://github.com/jharemza/workday-scraper-api/commit/9da3637711b6fd35970fd81ae62a52c312acca0c) by Jeremiah Haremza).
-
