@@ -79,6 +79,11 @@ jobs:
           fi
 
       # 6. Create a release based on newly generated tag
+      - name: Extract latest changelog section
+        id: changelog_section
+        run: |
+          awk '/^## \[v?[0-9]+\.[0-9]+\.[0-9]+/{i++} i==1' CHANGELOG.md > LATEST_CHANGELOG.md
+
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -89,5 +94,5 @@ jobs:
           else
             gh release create "v$VERSION" \
               --title "Release v$VERSION" \
-              --notes-file CHANGELOG.md
+              --notes-file LATEST_CHANGELOG.md
           fi
