@@ -52,7 +52,7 @@ jobs:
             git add CHANGELOG.md
             git commit -m "docs: bump changelog"
 
-            VERSION=$(grep -oP '^## \[\K[0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md | head -n 1)
+            VERSION=$(grep -oP '^## \[\Kv[0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md | head -n 1 | sed 's/^v//')
             echo "version=$VERSION" >> $GITHUB_OUTPUT
 
             if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
