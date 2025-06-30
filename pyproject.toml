@@ -17,7 +17,7 @@ build-backend = "setuptools.build_meta"
 [tool.git-changelog]
 bump = "auto" # Set
 convention = "conventional" # Set
-in-place = false # Set - change to true after first run
+in-place = true # Set - change to true after first run
 marker-line = "<!-- insertion marker -->" # Set
 output = "CHANGELOG.md" # Set
 parse-refs = true # Set - can change
