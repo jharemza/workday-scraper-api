@@ -6,37 +6,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
-## [v0.1.5](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.5) - 2025-06-30
-
-<small>[Compare with v0.1.4](https://github.com/jharemza/workday-scraper-api/compare/v0.1.4...v0.1.5)</small>
-
-## [v0.1.4](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.4) - 2025-06-30
-
-<small>[Compare with v0.1.3](https://github.com/jharemza/workday-scraper-api/compare/v0.1.3...v0.1.4)</small>
-
-### Chore
-
-- remove test file used for changelog trigger ([4f3e4a1](https://github.com/jharemza/workday-scraper-api/commit/4f3e4a16ab44cb4d0919dbdef0b2b073e688251b) by Jeremiah Haremza).
-
-## [v0.1.3](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.3) - 2025-06-30
-
-<small>[Compare with v0.1.2](https://github.com/jharemza/workday-scraper-api/compare/v0.1.2...v0.1.3)</small>
-
-## [v0.1.2](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.2) - 2025-06-30
-
-<small>[Compare with v0.1.1](https://github.com/jharemza/workday-scraper-api/compare/v0.1.1...v0.1.2)</small>
-
-### Docs
-
-- add test file to trigger changelog ([787915b](https://github.com/jharemza/workday-scraper-api/commit/787915b7722bee3ba10702f2bf64351679fce883) by Jeremiah Haremza).
-
-## [v0.1.1](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.1) - 2025-06-22
-
-<small>[Compare with v0.1.0](https://github.com/jharemza/workday-scraper-api/compare/v0.1.0...v0.1.1)</small>
-
-### Docs
-
-- bump changelog for refs/tags/v0.1.0 ([01a9087](https://github.com/jharemza/workday-scraper-api/commit/01a9087b26a5bca5d408163ea9799ba280b25d2b) by github-actions[bot]).
 
 ## [v0.1.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.0) - 2025-06-20
 
