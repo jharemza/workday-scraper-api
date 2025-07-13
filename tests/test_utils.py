@@ -1,6 +1,8 @@
 import sys
 import types
 import pytest
+from app.routes import row_to_dict
+from app.scraper_pkg.institution_runner import extract_salary_range, find_id_by_descriptor
 
 # Provide a minimal Flask stub so `app.routes` can be imported without the real
 # dependency present in the execution environment.
@@ -24,9 +26,6 @@ sys.modules.setdefault("flask", flask_stub)
 sys.modules.setdefault("yaml", types.SimpleNamespace(safe_load=lambda *a, **k: {}))
 sys.modules.setdefault("tqdm", types.SimpleNamespace(tqdm=lambda *a, **k: None))
 sys.modules.setdefault("requests", types.SimpleNamespace())
-
-from app.routes import row_to_dict
-from app.scraper_pkg.institution_runner import extract_salary_range, find_id_by_descriptor
 
 
 class DummyRow:
@@ -90,4 +89,3 @@ def test_find_id_by_descriptor_nested():
 
     param, fid = find_id_by_descriptor(facets, "Missing")
     assert param is None and fid is None
-
