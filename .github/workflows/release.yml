@@ -100,6 +100,7 @@ jobs:
           awk '/^## \[v?[0-9]+\.[0-9]+\.[0-9]+/{i++} i==1' CHANGELOG.md > LATEST_CHANGELOG.md
 
       - name: Create GitHub Release
+        if: steps.changelog.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
