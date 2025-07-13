@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.7](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.7) - 2025-07-13
+
+<small>[Compare with v0.1.6](https://github.com/jharemza/workday-scraper-api/compare/v0.1.6...v0.1.7)</small>
+
+### Docs
+
+- add AGENTS.md with guidelines for Codex agent contributions ([533bd00](https://github.com/jharemza/workday-scraper-api/commit/533bd00de32ac0ae7b274d6992dc694aaddbae05) by Jeremiah Haremza).
+
 ## [v0.1.6](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.6) - 2025-07-13
 
 <small>[Compare with v0.1.5](https://github.com/jharemza/workday-scraper-api/compare/v0.1.5...v0.1.6)</small>
