@@ -1,3 +1,8 @@
+import pytest
+
+pytest.importorskip("flask")
+
+
 def test_jobs_all(client):
     res = client.get("/jobs/all")
     assert res.status_code == 200
