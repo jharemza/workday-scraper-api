@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.3](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.3) - 2025-07-13
+
+<small>[Compare with v0.1.2](https://github.com/jharemza/workday-scraper-api/compare/v0.1.2...v0.1.3)</small>
+
+### Chore
+
+- remove unused scraper_pkg/scraper.py script (#7) ([39f2adb](https://github.com/jharemza/workday-scraper-api/commit/39f2adb6537633872d4525d7439cc705c738d0bb) by jharemza).
+- remove unused scraper script ([6dc5910](https://github.com/jharemza/workday-scraper-api/commit/6dc591093e5341ea8e9c196bc31a829e7a462e06) by jharemza).
+
 ## [v0.1.2](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.2) - 2025-07-13
 
 <small>[Compare with v0.1.1](https://github.com/jharemza/workday-scraper-api/compare/v0.1.1...v0.1.2)</small>
