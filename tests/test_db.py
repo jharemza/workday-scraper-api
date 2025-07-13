@@ -1,12 +1,14 @@
 import pytest
 from app import db
 
+
 @pytest.fixture()
 def temp_db(monkeypatch, tmp_path):
     db_file = tmp_path / "test.db"
     monkeypatch.setattr(db, "JOBS_DB_PATH", str(db_file))
     db.init_db()
     return db_file
+
 
 def test_insert_retrieve_delete(temp_db):
     sample = {
