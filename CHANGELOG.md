@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.4](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.4) - 2025-07-13
+
+<small>[Compare with v0.1.3](https://github.com/jharemza/workday-scraper-api/compare/v0.1.3...v0.1.4)</small>
+
+### Style
+
+- add double line spacing to satisfy flake8 ([f1f4e14](https://github.com/jharemza/workday-scraper-api/commit/f1f4e14c727e79ba6c7a6c3e0147b9ede9a8c530) by jharemza).
+
+### Tests
+
+- add CRUD tests for job posting database operations (#8) ([30e6488](https://github.com/jharemza/workday-scraper-api/commit/30e6488ec9df77d39c085b6df696eb856ece9702) by jharemza).
+- add db crud tests with temp sqlite ([e874a8c](https://github.com/jharemza/workday-scraper-api/commit/e874a8c72fa014aa8a8d6a48eb612dab67371f6f) by jharemza).
+
 ## [v0.1.3](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.3) - 2025-07-13
 
 <small>[Compare with v0.1.2](https://github.com/jharemza/workday-scraper-api/compare/v0.1.2...v0.1.3)</small>
