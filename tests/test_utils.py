@@ -2,7 +2,10 @@ import sys
 import types
 import pytest
 from app.routes import row_to_dict
-from app.scraper_pkg.institution_runner import extract_salary_range, find_id_by_descriptor
+from app.scraper_pkg.institution_runner import (
+    extract_salary_range,
+    find_id_by_descriptor,
+)
 
 
 # Provide a minimal Flask stub so `app.routes` can be imported without the real
@@ -14,6 +17,7 @@ class DummyBlueprint:
     def route(self, *args, **kwargs):
         def decorator(func):
             return func
+
         return decorator
 
 
@@ -21,7 +25,9 @@ flask_stub = types.SimpleNamespace(
     Blueprint=DummyBlueprint,
     jsonify=lambda *a, **k: {},
     request=types.SimpleNamespace(get_json=lambda *a, **k: {}),
-    current_app=types.SimpleNamespace(logger=types.SimpleNamespace(error=lambda *a, **k: None)),
+    current_app=types.SimpleNamespace(
+        logger=types.SimpleNamespace(error=lambda *a, **k: None)
+    ),
 )
 sys.modules.setdefault("flask", flask_stub)
 sys.modules.setdefault("yaml", types.SimpleNamespace(safe_load=lambda *a, **k: {}))
@@ -74,9 +80,7 @@ def test_find_id_by_descriptor_nested():
                 {"descriptor": "New York", "id": "ny"},
                 {
                     "facetParameter": "sub",
-                    "values": [
-                        {"descriptor": "Remote", "id": "remote"}
-                    ],
+                    "values": [{"descriptor": "Remote", "id": "remote"}],
                 },
             ],
         }
