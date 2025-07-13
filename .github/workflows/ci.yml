@@ -27,13 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
-
-      - name: Start Flask app
-        run: |
-          export FLASK_APP=app.main
-          nohup flask run --host=127.0.0.1 --port=5000 &
-          sleep 5
+          pip install pytest pytest-cov
 
       - name: Run tests with coverage
         run: |

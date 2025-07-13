@@ -170,7 +170,7 @@ python run.py serve
 ## Testing
 
 ```bash
-pytest --cov=app tests/
+pytest --cov=app --cov-report=xml tests/
 ```
 
 ## CI/CD

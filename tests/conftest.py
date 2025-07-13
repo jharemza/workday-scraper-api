@@ -1,6 +1,12 @@
 import pytest
 
+from app.main import create_app
+
 
 @pytest.fixture(scope="session")
-def base_url():
-    return "http://127.0.0.1:5000"
+def client():
+    """Flask test client for API routes."""
+    app = create_app()
+    app.testing = True
+    with app.test_client() as client:
+        yield client
