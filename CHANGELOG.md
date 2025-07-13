@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.2](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.2) - 2025-07-13
+
+<small>[Compare with v0.1.1](https://github.com/jharemza/workday-scraper-api/compare/v0.1.1...v0.1.2)</small>
+
+### Tests
+
+- fix Codecov 0% coverage issue for app/ folder (#6) ([2874d1f](https://github.com/jharemza/workday-scraper-api/commit/2874d1f3c19ab11a1a9ed7559e5eb7cdccf9480a) by jharemza). Related issues/PRs: [#4](https://github.com/jharemza/workday-scraper-api/issues/4)
+- run flask app via test client ([d3cf539](https://github.com/jharemza/workday-scraper-api/commit/d3cf53948a96134bfb5f3fa3bc525d27ca7e7c6f) by jharemza).
+
 ## [v0.1.1](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.1) - 2025-07-01
 
 <small>[Compare with v0.1.0](https://github.com/jharemza/workday-scraper-api/compare/v0.1.0...v0.1.1)</small>
