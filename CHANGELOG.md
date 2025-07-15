@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.10](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.10) - 2025-07-15
+
+<small>[Compare with v0.1.9](https://github.com/jharemza/workday-scraper-api/compare/v0.1.9...v0.1.10)</small>
+
+### Bug Fixes
+
+- scrape when DB table missing (#12) ([7120500](https://github.com/jharemza/workday-scraper-api/commit/7120500f1800f916fd306b00e97e3f23ec964427) by jharemza).
+- trigger scrape when jobs table missing ([7a0c22b](https://github.com/jharemza/workday-scraper-api/commit/7a0c22bb18c5fcdef959b1ffef4e4730992dbd9e) by jharemza).
+
 ## [v0.1.9](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.9) - 2025-07-15
 
 <small>[Compare with v0.1.8](https://github.com/jharemza/workday-scraper-api/compare/v0.1.8...v0.1.9)</small>
