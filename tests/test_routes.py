@@ -49,7 +49,7 @@ def test_scrape_route(client, monkeypatch, tmp_path):
     company = "M&T Bank"
     res = client.get(f"/jobs/company/{company}")
     assert res.status_code == 202
-    
+
     # After scraping, verify the job can be fetched via the API
     res = client.get(f"/jobs/company/{company}")
     assert res.status_code == 200
