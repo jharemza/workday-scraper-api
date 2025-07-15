@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.11](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.11) - 2025-07-15
+
+<small>[Compare with v0.1.10](https://github.com/jharemza/workday-scraper-api/compare/v0.1.10...v0.1.11)</small>
+
+### Tests
+
+- add trigger_scrape test and reformat CLI script with black (#13) ([c491975](https://github.com/jharemza/workday-scraper-api/commit/c491975e9d3be04a51b4b396db8a1a4117e687c4) by jharemza).
+- add trigger_scrape endpoint test ([978f827](https://github.com/jharemza/workday-scraper-api/commit/978f82745a98b09a53589aa48544491400ff7caa) by jharemza).
+
 ## [v0.1.10](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.10) - 2025-07-15
 
 <small>[Compare with v0.1.9](https://github.com/jharemza/workday-scraper-api/compare/v0.1.9...v0.1.10)</small>
