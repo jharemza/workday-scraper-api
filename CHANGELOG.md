@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.8](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.8) - 2025-07-15
+
+<small>[Compare with v0.1.7](https://github.com/jharemza/workday-scraper-api/compare/v0.1.7...v0.1.8)</small>
+
+### Tests
+
+- add API route tests for job endpoints (#10) ([de09873](https://github.com/jharemza/workday-scraper-api/commit/de09873d2521e642a070f663afb076c461d47c7f) by jharemza).
+- drop scrape endpoint to avoid network ([8ee0b69](https://github.com/jharemza/workday-scraper-api/commit/8ee0b69976f29ee7a875f4421b73378274c58a1b) by jharemza).
+
 ## [v0.1.7](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.7) - 2025-07-13
 
 <small>[Compare with v0.1.6](https://github.com/jharemza/workday-scraper-api/compare/v0.1.6...v0.1.7)</small>
