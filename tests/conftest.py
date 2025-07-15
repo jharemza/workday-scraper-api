@@ -2,11 +2,10 @@ import os
 import shutil
 import sys
 import types
-
 import pytest
 
-# Provide a minimal stub for the dotenv package if it's missing. The test
-# environment doesn't include the real python-dotenv dependency.
+# Provide a dummy `dotenv` module so imports succeed when the dependency is
+# unavailable in the test environment.
 if "dotenv" not in sys.modules:
     dotenv = types.ModuleType("dotenv")
 
@@ -16,10 +15,18 @@ if "dotenv" not in sys.modules:
     dotenv.load_dotenv = load_dotenv
     sys.modules["dotenv"] = dotenv
 
+try:
+    from app.main import create_app
+except ModuleNotFoundError:  # Flask (and thus app.main) not installed
+    create_app = None
+
 
 @pytest.fixture(scope="session")
 def client(tmp_path_factory):
     """Flask test client bound to a temporary database."""
+    if create_app is None:
+        pytest.skip("Flask not available", allow_module_level=True)
+
     # Copy the example jobs.db to a temp location so tests remain read-only
     db_src = os.path.join(os.path.dirname(os.path.dirname(__file__)), "jobs.db")
     db_dir = tmp_path_factory.mktemp("db")
@@ -29,11 +36,7 @@ def client(tmp_path_factory):
     # Ensure the application points at the temp DB
     os.environ["JOBS_DB_PATH"] = str(db_path)
 
-    from app.main import create_app
-
     app = create_app()
     app.testing = True
     with app.test_client() as test_client:
         yield test_client
-
-

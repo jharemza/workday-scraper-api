@@ -6,6 +6,49 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.7](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.7) - 2025-07-13
+
+<small>[Compare with v0.1.6](https://github.com/jharemza/workday-scraper-api/compare/v0.1.6...v0.1.7)</small>
+
+### Docs
+
+- add AGENTS.md with guidelines for Codex agent contributions ([533bd00](https://github.com/jharemza/workday-scraper-api/commit/533bd00de32ac0ae7b274d6992dc694aaddbae05) by Jeremiah Haremza).
+
+## [v0.1.6](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.6) - 2025-07-13
+
+<small>[Compare with v0.1.5](https://github.com/jharemza/workday-scraper-api/compare/v0.1.5...v0.1.6)</small>
+
+### Chore
+
+- deduplicate and clean up requirements.txt ([4c931eb](https://github.com/jharemza/workday-scraper-api/commit/4c931eb142e601525f2af76af969230fe8560f50) by Jeremiah Haremza).
+
+## [v0.1.5](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.5) - 2025-07-13
+
+<small>[Compare with v0.1.4](https://github.com/jharemza/workday-scraper-api/compare/v0.1.4...v0.1.5)</small>
+
+### Style
+
+- reformat tests/test_utils.py using black ([e71a068](https://github.com/jharemza/workday-scraper-api/commit/e71a068c92f3810ca7aa703163ec3bf3975dbc30) by Jeremiah Haremza).
+- add double line spacing to satisfy flake8 ([7cdc35a](https://github.com/jharemza/workday-scraper-api/commit/7cdc35a98f9fca9096e02d05242c8bdb51e59842) by jharemza).
+
+### Tests
+
+- add utils tests and stub Flask dependencies for isolated execution ([dcd9cd7](https://github.com/jharemza/workday-scraper-api/commit/dcd9cd78d1fd54dd8a78f605f38d411dff0966ac) by jharemza).
+- add utils unit tests ([f225300](https://github.com/jharemza/workday-scraper-api/commit/f22530047ff34f88eafc7b0819617e96d27ddab7) by jharemza).
+
+## [v0.1.4](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.4) - 2025-07-13
+
+<small>[Compare with v0.1.3](https://github.com/jharemza/workday-scraper-api/compare/v0.1.3...v0.1.4)</small>
+
+### Style
+
+- add double line spacing to satisfy flake8 ([f1f4e14](https://github.com/jharemza/workday-scraper-api/commit/f1f4e14c727e79ba6c7a6c3e0147b9ede9a8c530) by jharemza).
+
+### Tests
+
+- add CRUD tests for job posting database operations (#8) ([30e6488](https://github.com/jharemza/workday-scraper-api/commit/30e6488ec9df77d39c085b6df696eb856ece9702) by jharemza).
+- add db crud tests with temp sqlite ([e874a8c](https://github.com/jharemza/workday-scraper-api/commit/e874a8c72fa014aa8a8d6a48eb612dab67371f6f) by jharemza).
+
 ## [v0.1.3](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.3) - 2025-07-13
 
 <small>[Compare with v0.1.2](https://github.com/jharemza/workday-scraper-api/compare/v0.1.2...v0.1.3)</small>
