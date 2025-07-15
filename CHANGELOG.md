@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.9](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.9) - 2025-07-15
+
+<small>[Compare with v0.1.8](https://github.com/jharemza/workday-scraper-api/compare/v0.1.8...v0.1.9)</small>
+
+### Bug Fixes
+
+- resolve tests merge conflicts ([12b9088](https://github.com/jharemza/workday-scraper-api/commit/12b90884427691e029f33ebb5ea67ab0c7025841) by jharemza).
+
+### Style
+
+- run isort on route tests ([b9393f7](https://github.com/jharemza/workday-scraper-api/commit/b9393f7a2a29aac470daf7b061ddeaa917080640) by jharemza).
+
+### Tests
+
+- fix test_scrape_route to initialize test database ([4310550](https://github.com/jharemza/workday-scraper-api/commit/43105507d910af6f8e63f1d7cf5093b1e1cb58f5) by Jeremiah Haremza).
+
 ## [v0.1.8](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.8) - 2025-07-15
 
 <small>[Compare with v0.1.7](https://github.com/jharemza/workday-scraper-api/compare/v0.1.7...v0.1.8)</small>
