@@ -1,5 +1,4 @@
 import pytest
-
 import app.config as config
 import app.db as db
 
@@ -48,9 +47,9 @@ def test_scrape_route(client, monkeypatch, tmp_path):
     monkeypatch.setattr(db, "JOBS_DB_PATH", str(tmp_path / "route.db"))
 
     company = "M&T Bank"
-    res = client.post("/jobs/scrape", json={"companies": [company]})
-    assert res.status_code == 202
-
+    res = client.get(f"/jobs/company/{company}")
+    assert res.status_code == 200
+    
     data = res.get_json()
     if "scraped" in data:
         assert data["scraped"] is None

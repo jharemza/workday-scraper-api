@@ -2,8 +2,8 @@ import os
 import shutil
 import sys
 import types
-
 import pytest
+
 
 # Provide a dummy `dotenv` module so imports succeed when the dependency is
 # unavailable in the test environment.
