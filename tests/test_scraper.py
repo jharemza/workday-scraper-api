@@ -1,0 +1,93 @@
+import sqlite3
+from types import SimpleNamespace
+
+import pytest
+
+import app.db as db
+import app.config as config
+from app.scraper import run_scrape
+from app.scraper_pkg.institution_runner import run_institution_scraper
+import app.scraper_pkg.config_loader as config_loader
+import app.scraper_pkg.institution_runner as runner
+
+
+class DummyResponse:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def json(self):
+        return self.payload
+
+    def raise_for_status(self):
+        pass
+
+
+def test_run_institution_scraper(monkeypatch):
+    posts = [
+        DummyResponse({"facets": []}),
+        DummyResponse({"jobPostings": [{"externalPath": "path/1"}], "total": 2}),
+        DummyResponse({"jobPostings": [{"externalPath": "path/2"}], "total": 2}),
+    ]
+
+    def mock_post(url, json=None, headers=None):
+        return posts.pop(0)
+
+    gets = {
+        "http://example.com/job/1": DummyResponse({"jobPostingInfo": {"id": "1"}}),
+        "http://example.com/job/2": DummyResponse({"jobPostingInfo": {"id": "2"}}),
+    }
+
+    def mock_get(url, headers=None):
+        return gets[url]
+
+    monkeypatch.setattr(runner.requests, "post", mock_post)
+    monkeypatch.setattr(runner.requests, "get", mock_get)
+    monkeypatch.setattr(runner.time, "sleep", lambda *a, **k: None)
+    monkeypatch.setattr(config, "SCRAPE_LIMIT", 1)
+    inst = {
+        "name": "Test",
+        "workday_url": "http://example.com/jobs",
+        "search_text": "",
+        "locations": [],
+    }
+
+    jobs = run_institution_scraper(inst)
+    assert len(jobs) == 2
+    assert {j["id"] for j in jobs} == {"1", "2"}
+
+
+def test_run_scrape_db_ops(monkeypatch, tmp_path):
+    db_path = tmp_path / "test.db"
+    monkeypatch.setattr(config, "JOBS_DB_PATH", str(db_path))
+    monkeypatch.setattr(db, "JOBS_DB_PATH", str(db_path))
+
+    inst_cfg = {
+        "name": "Test",
+        "workday_url": "http://example.com/jobs",
+        "search_text": "",
+    }
+    monkeypatch.setattr(config_loader, "load_institutions_config", lambda: [inst_cfg])
+
+    def first(_cfg):
+        return [
+            {"id": "1", "jobDescription": "desc $50 - $60"},
+            {"id": "2", "jobDescription": "desc"},
+        ]
+
+    monkeypatch.setattr(runner, "run_institution_scraper", first)
+    monkeypatch.setattr("app.scraper.run_institution_scraper", first)
+    run_scrape(["Test"])
+    rows = db.get_jobs_by_company("Test")
+    assert {r["workday_id"] for r in rows} == {"1", "2"}
+
+    def second(_cfg):
+        return [
+            {"id": "2", "jobDescription": "desc"},
+            {"id": "3", "jobDescription": "desc"},
+        ]
+
+    monkeypatch.setattr(runner, "run_institution_scraper", second)
+    monkeypatch.setattr("app.scraper.run_institution_scraper", second)
+    run_scrape(["Test"])
+    rows = db.get_jobs_by_company("Test")
+    assert {r["workday_id"] for r in rows} == {"2", "3"}

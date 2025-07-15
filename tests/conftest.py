@@ -1,5 +1,8 @@
 import pytest
-
+try:
+    import flask  # noqa: F401
+except Exception:
+    pytest.skip("flask not installed", allow_module_level=True)
 from app.main import create_app
 
 
