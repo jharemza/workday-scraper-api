@@ -43,16 +43,25 @@ def jobs_today():
 
 @jobs_bp.route("/company/<company>", methods=["GET"])
 def jobs_company(company):
+    """Return jobs for ``company`` or trigger a scrape if the table is missing."""
 
     try:
         rows = get_jobs_by_company(company)
         return jsonify([row_to_dict(r) for r in rows])
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
+        # When the database table doesn't exist yet, kick off a scrape so the
+        # subsequent request can succeed.  This mirrors the behaviour expected
+        # by tests which call this endpoint on a fresh database.
+        if "no such table" in str(e):
+            current_app.logger.warning(
+                f"Table missing, triggering scrape for {company}: {e}"
+            )
+            run_scrape([company])
+            return jsonify({"triggered": company}), 202
+
         current_app.logger.error(f"Error in /jobs/company/{company}: {e}")
         return (
-            jsonify(
-                {"error": "Could not fetch {} jobs".format(company), "details": str(e)}
-            ),
+            jsonify({"error": f"Could not fetch {company} jobs", "details": str(e)}),
             500,
         )
 
