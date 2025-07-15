@@ -6,6 +6,7 @@ try:
 except Exception:
     pytest.skip("flask not installed", allow_module_level=True)
 
+
 def test_jobs_all(client):
     res = client.get("/jobs/all")
     assert res.status_code == 200

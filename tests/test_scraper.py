@@ -1,8 +1,3 @@
-import sqlite3
-from types import SimpleNamespace
-
-import pytest
-
 import app.db as db
 import app.config as config
 from app.scraper import run_scrape
