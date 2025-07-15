@@ -15,9 +15,10 @@ def cli():
 
 @cli.command()
 @click.option(
-    "--companies", "-c",
+    "--companies",
+    "-c",
     multiple=True,
-    help="One or more company names to scrape. If omitted, scrapes all from config."
+    help="One or more company names to scrape. If omitted, scrapes all from config.",
 )
 def scrape(companies):
     """
@@ -33,7 +34,9 @@ def scrape(companies):
 
 @cli.command()
 @click.option("--host", default=config.API_HOST, help="Host to bind the API server to.")
-@click.option("--port", default=config.API_PORT, type=int, help="Port for the API server.")
+@click.option(
+    "--port", default=config.API_PORT, type=int, help="Port for the API server."
+)
 def serve(host, port):
     """
     Launch the Flask API.
