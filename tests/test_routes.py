@@ -9,15 +9,28 @@ def test_jobs_all(client):
     assert isinstance(res.get_json(), list)
 
 
-def test_scrape_route(client):
-    # Replace this with one of your configured institutions
-    company = "M&T Bank"
-    res = client.post("/jobs/scrape", json={"companies": [company]})
-    assert res.status_code == 202
-
+def test_jobs_today(client):
+    res = client.get("/jobs/today")
+    assert res.status_code == 200
     data = res.get_json()
-    # If jobs were scraped, we expect a list
-    if "scraped" in data:
-        assert data["scraped"] is None
-    else:
-        assert isinstance(data, list)
+    assert isinstance(data, list)
+
+
+def test_jobs_company(client):
+    company = "M&T Bank"
+    res = client.get(f"/jobs/company/{company}")
+    assert res.status_code == 200
+    data = res.get_json()
+    assert isinstance(data, list)
+    if data:
+        assert all(job["company"] == company for job in data)
+
+
+def test_jobs_company_new(client):
+    company = "M&T Bank"
+    res = client.get(f"/jobs/company/{company}/new")
+    assert res.status_code == 200
+    data = res.get_json()
+    assert isinstance(data, list)
+    if data:
+        assert all(job["company"] == company for job in data)
