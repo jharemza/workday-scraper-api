@@ -4,6 +4,7 @@ import sys
 import types
 import pytest
 
+
 # Provide a dummy `dotenv` module so imports succeed when the dependency is
 # unavailable in the test environment.
 if "dotenv" not in sys.modules:
@@ -14,6 +15,11 @@ if "dotenv" not in sys.modules:
 
     dotenv.load_dotenv = load_dotenv
     sys.modules["dotenv"] = dotenv
+
+try:
+    import flask  # noqa: F401
+except Exception:
+    pytest.skip("flask not installed", allow_module_level=True)
 
 try:
     from app.main import create_app
