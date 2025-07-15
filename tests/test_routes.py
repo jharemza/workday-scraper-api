@@ -1,6 +1,8 @@
 import pytest
+
 import app.config as config
 import app.db as db
+
 try:
     import flask  # noqa: F401
 except Exception:

@@ -1,4 +1,5 @@
 import pytest
+
 try:
     import flask  # noqa: F401
 except Exception:
