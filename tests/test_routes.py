@@ -48,10 +48,11 @@ def test_scrape_route(client, monkeypatch, tmp_path):
 
     company = "M&T Bank"
     res = client.get(f"/jobs/company/{company}")
-    assert res.status_code == 200
+    assert res.status_code == 202
     
-    data = res.get_json()
-    if "scraped" in data:
-        assert data["scraped"] is None
-    else:
-        assert isinstance(data, list)
+    # After scraping, verify the job can be fetched via the API
+    res = client.get(f"/jobs/company/{company}")
+    assert res.status_code == 200
+    rows = res.get_json()
+    assert rows
+    assert {row["workday_id"] for row in rows} == {"1"}
