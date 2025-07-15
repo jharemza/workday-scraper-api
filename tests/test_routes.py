@@ -56,3 +56,10 @@ def test_scrape_route(client, monkeypatch, tmp_path):
     rows = res.get_json()
     assert rows
     assert {row["workday_id"] for row in rows} == {"1"}
+
+
+def test_trigger_scrape(client, monkeypatch):
+    monkeypatch.setattr("app.routes.run_scrape", lambda comps: "ok")
+    res = client.post("/jobs/scrape", json={"companies": ["TestCo"]})
+    assert res.status_code == 202
+    assert res.get_json() == {"scraped": "ok"}
