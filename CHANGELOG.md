@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.15](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.15) - 2025-07-16
+
+<small>[Compare with v0.1.14](https://github.com/jharemza/workday-scraper-api/compare/v0.1.14...v0.1.15)</small>
+
+### Tests
+
+- add unit test for job fetch error handling in institution scraper (#17) ([639aefe](https://github.com/jharemza/workday-scraper-api/commit/639aefe3e0099646e5a95cf66a6b8b9ab46f1c4c) by jharemza).
+- handle job fetch errors ([c5f7e1f](https://github.com/jharemza/workday-scraper-api/commit/c5f7e1f152172dbc7c2bd5abaf208d35571adf2a) by jharemza).
+
 ## [v0.1.14](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.14) - 2025-07-16
 
 <small>[Compare with v0.1.13](https://github.com/jharemza/workday-scraper-api/compare/v0.1.13...v0.1.14)</small>
