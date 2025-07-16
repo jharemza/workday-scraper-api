@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.13](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.13) - 2025-07-16
+
+<small>[Compare with v0.1.12](https://github.com/jharemza/workday-scraper-api/compare/v0.1.12...v0.1.13)</small>
+
+### Tests
+
+- ensure run_institution_scraper returns empty list on facet fetch error (#15) ([dae69d6](https://github.com/jharemza/workday-scraper-api/commit/dae69d6f2050e53fcd6fc64e28a3b1b5560fcdb6) by jharemza).
+- cover facets failure path ([076ecd2](https://github.com/jharemza/workday-scraper-api/commit/076ecd2d162cb64d542c5f0cecf0d8bc8ba16fbf) by jharemza).
+
 ## [v0.1.12](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.12) - 2025-07-16
 
 <small>[Compare with v0.1.11](https://github.com/jharemza/workday-scraper-api/compare/v0.1.11...v0.1.12)</small>
