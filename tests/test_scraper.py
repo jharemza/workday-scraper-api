@@ -86,3 +86,22 @@ def test_run_scrape_db_ops(monkeypatch, tmp_path):
     run_scrape(["Test"])
     rows = db.get_jobs_by_company("Test")
     assert {r["workday_id"] for r in rows} == {"2", "3"}
+
+
+def test_run_institution_scraper_facets_error(monkeypatch):
+    """If the initial POST request fails, an empty list should be returned."""
+
+    def fail_post(*_args, **_kwargs):
+        raise Exception("boom")
+
+    monkeypatch.setattr(runner.requests, "post", fail_post)
+
+    inst = {
+        "name": "Test",
+        "workday_url": "http://example.com/jobs",
+        "search_text": "",
+        "locations": [],
+    }
+
+    jobs = run_institution_scraper(inst)
+    assert jobs == []
