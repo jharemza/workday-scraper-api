@@ -21,11 +21,6 @@ DATE_FMT = "%Y-%m-%d %H:%M:%S"
 root_logger = logging.getLogger()
 root_logger.setLevel(config.LOG_LEVEL)
 
-# Console handler
-ch = logging.StreamHandler()
-ch.setLevel(config.LOG_LEVEL)
-ch.setFormatter(logging.Formatter(LOG_FORMAT, datefmt=DATE_FMT))
-root_logger.addHandler(ch)
 
 # Rotating file handler (10 MB per file, keep 5 backups)
 fh = RotatingFileHandler(
