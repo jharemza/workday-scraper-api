@@ -38,7 +38,7 @@ The OpenAPI Swagger UI for this API is available at:
 - Persist scraped data in a SQLite database
 - Expose a RESTful Flask API to query and trigger scrapes
 - Configurable via environment variables and `.env`
-- Structured logging to console and rotating log files
+- Structured logging to rotating log files
 - Automated changelog and daily ingestion via GitHub Actions
 
 ## Architecture
@@ -163,7 +163,6 @@ python run.py serve
 
 ## Logging
 
-- Console: Verbose, timestamped output
 - File: `logs/app.log` (rotates at 10 MB, keeps 5 backups)
 - Level: Controlled by `LOG_LEVEL` (DEBUG, INFO, etc.)
 
