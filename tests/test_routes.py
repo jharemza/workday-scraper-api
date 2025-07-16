@@ -63,3 +63,42 @@ def test_trigger_scrape(client, monkeypatch):
     res = client.post("/jobs/scrape", json={"companies": ["TestCo"]})
     assert res.status_code == 202
     assert res.get_json() == {"scraped": "ok"}
+
+
+def _raise(*_args, **_kwargs):
+    raise Exception("boom")
+
+
+def test_jobs_all_error(client, monkeypatch):
+    monkeypatch.setattr("app.routes.get_all_jobs", _raise)
+    res = client.get("/jobs/all")
+    assert res.status_code == 500
+    assert "error" in res.get_json()
+
+
+def test_jobs_today_error(client, monkeypatch):
+    monkeypatch.setattr("app.routes.get_jobs_today", _raise)
+    res = client.get("/jobs/today")
+    assert res.status_code == 500
+    assert "error" in res.get_json()
+
+
+def test_jobs_company_error(client, monkeypatch):
+    monkeypatch.setattr("app.routes.get_jobs_by_company", _raise)
+    res = client.get("/jobs/company/TestCo")
+    assert res.status_code == 500
+    assert "error" in res.get_json()
+
+
+def test_jobs_company_new_error(client, monkeypatch):
+    monkeypatch.setattr("app.routes.get_new_jobs_by_company", _raise)
+    res = client.get("/jobs/company/TestCo/new")
+    assert res.status_code == 500
+    assert "error" in res.get_json()
+
+
+def test_trigger_scrape_error(client, monkeypatch):
+    monkeypatch.setattr("app.routes.run_scrape", _raise)
+    res = client.post("/jobs/scrape", json={"companies": ["TestCo"]})
+    assert res.status_code == 500
+    assert "error" in res.get_json()
