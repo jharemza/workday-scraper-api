@@ -41,7 +41,11 @@ jobs:
       - name: Generate and commit changelog
         id: changelog
         run: |
-          git-changelog
+          if ! git-changelog; then
+            echo "⚠️ git-changelog failed. Possibly due to duplicate version."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           # Extract the latest version block
           awk '
