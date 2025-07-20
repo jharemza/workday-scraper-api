@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.17](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.17) - 2025-07-20
+
+<small>[Compare with v0.1.16](https://github.com/jharemza/workday-scraper-api/compare/v0.1.16...v0.1.17)</small>
+
+### Bug Fixes
+
+- prevent changelog step from failing on duplicate version ([4edbb2a](https://github.com/jharemza/workday-scraper-api/commit/4edbb2a39e796990baee9dc5ed731b11b24a3471) by Jeremiah Haremza).
+
 ## [v0.1.16](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.16) - 2025-07-19
 
 <small>[Compare with v0.1.15](https://github.com/jharemza/workday-scraper-api/compare/v0.1.15...v0.1.16)</small>
