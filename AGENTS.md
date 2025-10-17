@@ -57,7 +57,6 @@ Before finalizing a pull request:
 - [ ] Run flake8 with no errors
 - [ ] Run black . with no changes
 - [ ] Run pytest --cov=. and verify no test failures
-- [ ] Confirm Notion integration tests pass (mocked if no token available)
 
 ## How Agents Should Work
 

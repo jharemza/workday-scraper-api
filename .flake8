@@ -1,5 +1,5 @@
-# .flake8
-
 [flake8]
-max-line-length = 100
-exclude = .git,__pycache__,env,venv,tests/__init__.py
+max-line-length = 88
+extend-ignore = E203,W503
+exclude = .git, __pycache__, build, dist, env, venv, .venv, tests/__init__.py
+

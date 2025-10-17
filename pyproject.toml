@@ -5,9 +5,7 @@ description = "A Flask-based API for scraping and serving job data from Workday-
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-authors = [
-  { name="Jeremiah Haremza", email="contact@jeremiahharemza.com" }
-]
+authors = [{ name = "Jeremiah Haremza", email = "contact@jeremiahharemza.com" }]
 dependencies = []
 
 [build-system]
@@ -24,8 +22,22 @@ parse-refs = true # Set - can change
 parse-trailers = true # Set - can change
 provider = "github" # Set
 repository = "." # Set
-sections = ["feat", "fix", "chore", "docs", "style", "refactor", "perf", "test"] # Set
+sections = [
+  "feat",
+  "fix",
+  "chore",
+  "docs",
+  "style",
+  "refactor",
+  "perf",
+  "test",
+] # Set
 template = "keepachangelog" # Set
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)" # Set
 versioning = "semver" # Set
 zerover = true # Set
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+skip-string-normalization = false

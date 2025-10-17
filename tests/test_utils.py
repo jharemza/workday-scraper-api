@@ -60,6 +60,20 @@ def test_extract_salary_range_valid():
     assert high == pytest.approx(70000.0)
 
 
+def test_extract_salary_range_with_spaces():
+    desc = "Salary range: $ 60, 000  -$ 80,500 per annum"
+    low, high = extract_salary_range(desc)
+    assert low == pytest.approx(60000.0)
+    assert high == pytest.approx(80500.0)
+
+
+def test_extract_salary_range_with_decimals():
+    desc = "Hourly pay is $20.50 – $30.75 depending on experience"
+    low, high = extract_salary_range(desc)
+    assert low == pytest.approx(20.50)
+    assert high == pytest.approx(30.75)
+
+
 def test_extract_salary_range_invalid_numbers():
     desc = "Salary range is $abc - $123"
     low, high = extract_salary_range(desc)
