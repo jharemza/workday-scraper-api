@@ -204,7 +204,8 @@ def run_institution_scraper(institution: dict):
 
         jobs = response.json().get("jobPostings", [])
         jobs_data = [
-            f"{url.rsplit('/jobs', 1)[0]}/job/{job.get('externalPath', '').split('/')[-1]}"
+            f"{url.rsplit('/jobs', 1)[0]}/job/{job.get('externalPath',
+                                                       '').split('/')[-1]}"
             for job in jobs
             if "externalPath" in job
         ]
