@@ -173,7 +173,10 @@ def run_institution_scraper(institution: dict):
 
     # Collect URLs from first batch
     first_jobs_data = [
-        f"{url.rsplit('/jobs', 1)[0]}/job/{job.get('externalPath', '').split('/')[-1]}"
+        (
+            f"{url.rsplit('/jobs', 1)[0]}/job/"
+            f"{job.get('externalPath', '').split('/')[-1]}"
+        )
         for job in jobs_first_batch
         if "externalPath" in job
     ]
@@ -204,8 +207,10 @@ def run_institution_scraper(institution: dict):
 
         jobs = response.json().get("jobPostings", [])
         jobs_data = [
-            f"{url.rsplit('/jobs', 1)[0]}/job/{job.get('externalPath',
-                                                       '').split('/')[-1]}"
+            (
+                f"{url.rsplit('/jobs', 1)[0]}/job/"
+                f"{job.get('externalPath', '').split('/')[-1]}"
+            )
             for job in jobs
             if "externalPath" in job
         ]
