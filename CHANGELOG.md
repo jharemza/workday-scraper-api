@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.18](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.18) - 2025-10-17
+
+<small>[Compare with v0.1.17](https://github.com/jharemza/workday-scraper-api/compare/v0.1.17...v0.1.18)</small>
+
+### Bug Fixes
+
+- correct salary range extraction ([dda56dd](https://github.com/jharemza/workday-scraper-api/commit/dda56dda9918619dfa32da6b134aa0b180af85ea) by jharemza).
+
+### Chore
+
+- update .coverage file after successful test run ([c5253b3](https://github.com/jharemza/workday-scraper-api/commit/c5253b3ec7a56b0594575c132a66d8e9dd4b1d2c) by Jeremiah Haremza).
+- updated flake8 settings ([3baac05](https://github.com/jharemza/workday-scraper-api/commit/3baac0529c20ea6aac696ab1f97a268bfd4b0587) by Jeremiah Haremza).
+- move Flake8 settings from pyproject.toml to .flake8 ([6ec22dd](https://github.com/jharemza/workday-scraper-api/commit/6ec22dddea0371224b0c825d2b18161eb97cb558) by Jeremiah Haremza).
+- removed .flake8 file after migrating settings to pyproject.toml ([9f9ad71](https://github.com/jharemza/workday-scraper-api/commit/9f9ad71279dba3549190a9c843a1c45e03b2daeb) by Jeremiah Haremza).
+- add Black and Flake8 configuration to pyproject.toml ([3c1e81c](https://github.com/jharemza/workday-scraper-api/commit/3c1e81c0d992ee4642f5533d21d830fb7aab74f9) by Jeremiah Haremza).
+- update Python dependencies in requirements.txt ([338284d](https://github.com/jharemza/workday-scraper-api/commit/338284dee7fb77fa8d93b49b70fa45db5cee9e41) by Jeremiah Haremza).
+- add .venv/ to .gitignore ([d801631](https://github.com/jharemza/workday-scraper-api/commit/d80163101ecadb897ffbba6f8edb25ca4cb2065d) by Jeremiah Haremza).
+
+### Docs
+
+- remove incorrect Notion reference from AGENTS.md ([69fce73](https://github.com/jharemza/workday-scraper-api/commit/69fce73b314a9f4f7260857e122bde211caa8c88) by Jeremiah Haremza).
+
+### Style
+
+- reformat long f-strings in list comprehensions for line length compliance ([2ca6121](https://github.com/jharemza/workday-scraper-api/commit/2ca61210e869c329b6bcb489708773eb0cec4fa1) by Jeremiah Haremza).
+- fix E501 line length issue in institution_runner.py ([7d4a5e7](https://github.com/jharemza/workday-scraper-api/commit/7d4a5e789934affc2e62b3c00dfcd782c3bd55ab) by Jeremiah Haremza).
+
 ## [v0.1.17](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.17) - 2025-07-20
 
 <small>[Compare with v0.1.16](https://github.com/jharemza/workday-scraper-api/compare/v0.1.16...v0.1.17)</small>
