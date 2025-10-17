@@ -51,26 +51,32 @@ def find_id_by_descriptor(facets, target_descriptor):
 
 
 def extract_salary_range(description):
-    """
-    Extracts salary range (low, high) as floats from jobDescription HTML text.
-    """
+    """Extract salary range (low, high) as floats from jobDescription HTML text."""
+
+    # Match values that may contain spaces, commas, or decimals and account for
+    # optional whitespace around the currency symbol and hyphen variations.
     match = re.search(
-        r"\$([\d,]+(?:\.\d{2})?)\s*-\s*\$([\d,]+(?:\.\d{2})?)", description
+        r"\$\s*([\d][\d,\s]*(?:\.\d+)?)\s*[-–—]\s*\$?\s*([\d][\d,\s]*(?:\.\d+)?)",
+        description,
     )
-    if match:
-        low_str = match.group(1).replace(",", "")
-        high_str = match.group(2).replace(",", "")
-        try:
-            low = float(low_str)
-            high = float(high_str)
-            return low, high
-        except ValueError:
-            logging.debug(
-                f"Float conversion failed: low='{low_str}', high='{high_str}'"
-            )
-            return None, None
-    else:
+    if not match:
         logging.debug("Salary pattern not found in job description.")
+        return None, None
+
+    def _clean_numeric(value: str) -> str:
+        """Strip non-numeric characters (except decimal point) from salary text."""
+
+        return re.sub(r"[^\d.]", "", value)
+
+    low_str = _clean_numeric(match.group(1))
+    high_str = _clean_numeric(match.group(2))
+
+    try:
+        low = float(low_str)
+        high = float(high_str)
+        return low, high
+    except ValueError:
+        logging.debug(f"Float conversion failed: low='{low_str}', high='{high_str}'")
         return None, None
 
 
