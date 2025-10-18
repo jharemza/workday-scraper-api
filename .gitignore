@@ -12,3 +12,8 @@ EOF
 
 # Log file output
 logs/*.log
+
+# Database files
+*.sqlite3
+*.db
+jobs.db
