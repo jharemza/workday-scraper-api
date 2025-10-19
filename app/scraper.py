@@ -114,7 +114,7 @@ def run_scrape(companies=None):
                 delete_job_posting(company, old_id)
                 deleted += 1
 
-            skipped = len(jobs) - inserted - deleted
+            skipped = len(jobs) - inserted
 
         tqdm.write(f"\n📊 {company} Summary:")
         tqdm.write(f"  ✅ Inserted: {inserted}")
