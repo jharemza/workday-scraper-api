@@ -88,6 +88,37 @@ def test_run_scrape_db_ops(monkeypatch, tmp_path):
     assert {r["workday_id"] for r in rows} == {"2", "3"}
 
 
+def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
+    inserted_ids = []
+    captured_logs = []
+
+    monkeypatch.setattr("app.scraper.init_db", lambda: None)
+    monkeypatch.setattr(
+        "app.scraper.load_institutions_config", lambda: [{"name": "Test"}]
+    )
+    jobs = [
+        {"id": "1", "jobDescription": "existing role"},
+        {"id": "2", "jobDescription": "new role"},
+    ]
+    monkeypatch.setattr("app.scraper.run_institution_scraper", lambda _cfg: jobs)
+    monkeypatch.setattr("app.scraper.get_existing_job_ids", lambda _company: {"1"})
+
+    def fake_insert(company, workday_id, *args, **kwargs):
+        inserted_ids.append((company, workday_id))
+
+    monkeypatch.setattr("app.scraper.insert_job_posting", fake_insert)
+    monkeypatch.setattr("app.scraper.delete_job_posting", lambda *a, **k: None)
+    monkeypatch.setattr("app.scraper.tqdm.write", lambda message: captured_logs.append(message))
+
+    run_scrape(["Test"])
+
+    inserted_count = len(inserted_ids)
+    skipped_line = next(line for line in captured_logs if "Skipped" in line)
+    skipped_value = int(skipped_line.split(":")[-1].strip())
+
+    assert skipped_value == len(jobs) - inserted_count
+
+
 def test_run_institution_scraper_facets_error(monkeypatch):
     """If the initial POST request fails, an empty list should be returned."""
 
