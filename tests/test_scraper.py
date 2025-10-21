@@ -109,8 +109,7 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
     monkeypatch.setattr("app.scraper.insert_job_posting", fake_insert)
     monkeypatch.setattr("app.scraper.delete_job_posting", lambda *a, **k: None)
     monkeypatch.setattr(
-        "app.scraper.tqdm.write",
-        lambda message: captured_logs.append(message)
+        "app.scraper.tqdm.write", lambda message: captured_logs.append(message)
     )
 
     run_scrape(["Test"])
