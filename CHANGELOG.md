@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.20](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.20) - 2025-10-21
+
+<small>[Compare with v0.1.19](https://github.com/jharemza/workday-scraper-api/compare/v0.1.19...v0.1.20)</small>
+
+### Bug Fixes
+
+- correct skipped job count calculation ([3be2ab1](https://github.com/jharemza/workday-scraper-api/commit/3be2ab1955be697b75cc3417f541ac5a165f6a9b) by Jeremiah Haremza).
+
+### Chore
+
+- add jobs.db back and modified .gitignore to match ([985741a](https://github.com/jharemza/workday-scraper-api/commit/985741a23168542eabca01a8529ab3041f5cdd35) by Jeremiah Haremza).
+
+### Style
+
+- format codein test_scraper.py to comply with black settings ([6c063ba](https://github.com/jharemza/workday-scraper-api/commit/6c063ba68b675dc493884ef0a5c23b8b2ded7a93) by Jeremiah Haremza).
+- format code in test_scraper.py to comply with flake8 settings ([a64045d](https://github.com/jharemza/workday-scraper-api/commit/a64045d37866dbbb9c3bc26cde6927a50df79bff) by Jeremiah Haremza).
+
+### Tests
+
+- add regression test for skipped job count logic ([8cb1c19](https://github.com/jharemza/workday-scraper-api/commit/8cb1c19bd92c8d8682402ace836faecbbba1b860) by jharemza). test: cover skipped summary calculation
+- verify skipped count ([d54cff5](https://github.com/jharemza/workday-scraper-api/commit/d54cff58b5c51837e7bee91a2522eed5e15c05d1) by jharemza).
+
 ## [v0.1.19](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.19) - 2025-10-18
 
 <small>[Compare with v0.1.18](https://github.com/jharemza/workday-scraper-api/compare/v0.1.18...v0.1.19)</small>
