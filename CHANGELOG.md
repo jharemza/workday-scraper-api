@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.21](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.21) - 2025-10-27
+
+<small>[Compare with v0.1.20](https://github.com/jharemza/workday-scraper-api/compare/v0.1.20...v0.1.21)</small>
+
+### Chore
+
+- ignore local jobs database file ([123e6ef](https://github.com/jharemza/workday-scraper-api/commit/123e6ef205a77da74284a83eaaa7ebaa8ca20134) by jharemza).
+- ignore jobs database ([8f4d671](https://github.com/jharemza/workday-scraper-api/commit/8f4d67138959574eafd31605e3ad7ac7170eec68) by jharemza).
+
+### Tests
+
+- bootstrap test database when fixture missing ([a9ff305](https://github.com/jharemza/workday-scraper-api/commit/a9ff305c0c488999c5bac8561f8f19095cba49e3) by jharemza).
+
 ## [v0.1.20](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.20) - 2025-10-21
 
 <small>[Compare with v0.1.19](https://github.com/jharemza/workday-scraper-api/compare/v0.1.19...v0.1.20)</small>
