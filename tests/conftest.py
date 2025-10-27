@@ -33,14 +33,28 @@ def client(tmp_path_factory):
     if create_app is None:
         pytest.skip("Flask not available", allow_module_level=True)
 
-    # Copy the example jobs.db to a temp location so tests remain read-only
-    db_src = os.path.join(os.path.dirname(os.path.dirname(__file__)), "jobs.db")
+    # Copy the example jobs.db to a temp location if it exists, otherwise
+    # bootstrap a fresh database so tests do not rely on a tracked artifact.
+    project_root = os.path.dirname(os.path.dirname(__file__))
+    db_src = os.path.join(project_root, "jobs.db")
     db_dir = tmp_path_factory.mktemp("db")
     db_path = db_dir / "jobs.db"
-    shutil.copyfile(db_src, db_path)
 
-    # Ensure the application points at the temp DB
+    from app import config as app_config
+    from app import db as app_db
+
+    if os.path.exists(db_src):
+        shutil.copyfile(db_src, db_path)
+    else:
+        # Initialise a new empty database with the required schema.
+        app_config.JOBS_DB_PATH = str(db_path)
+        app_db.JOBS_DB_PATH = str(db_path)
+        app_db.init_db()
+
+    # Ensure both the environment and imported modules reference the temp DB
     os.environ["JOBS_DB_PATH"] = str(db_path)
+    app_config.JOBS_DB_PATH = str(db_path)
+    app_db.JOBS_DB_PATH = str(db_path)
 
     app = create_app()
     app.testing = True
