@@ -12,3 +12,6 @@ EOF
 
 # Log file output
 logs/*.log
+
+# Database files
+jobs.db
