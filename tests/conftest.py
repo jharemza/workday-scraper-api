@@ -2,6 +2,8 @@ import os
 import shutil
 import sys
 import types
+from pathlib import Path
+
 import pytest
 
 
@@ -33,14 +35,28 @@ def client(tmp_path_factory):
     if create_app is None:
         pytest.skip("Flask not available", allow_module_level=True)
 
-    # Copy the example jobs.db to a temp location so tests remain read-only
-    db_src = os.path.join(os.path.dirname(os.path.dirname(__file__)), "jobs.db")
+    project_root = Path(__file__).resolve().parents[1]
+    db_src = project_root / "jobs.db"
     db_dir = tmp_path_factory.mktemp("db")
-    db_path = db_dir / "jobs.db"
-    shutil.copyfile(db_src, db_path)
+    db_path = Path(db_dir) / "jobs.db"
 
-    # Ensure the application points at the temp DB
+    # Ensure the environment advertises the temporary database before importing
+    # application modules so defaults derived from JOBS_DB_PATH use the temp file.
     os.environ["JOBS_DB_PATH"] = str(db_path)
+
+    from app import config as app_config
+    from app import db as app_db
+
+    if db_src.exists():
+        shutil.copyfile(db_src, db_path)
+    else:
+        # Initialise a new empty database with the required schema.
+        app_db.JOBS_DB_PATH = str(db_path)
+        app_db.init_db()
+
+    # Keep the imported modules aligned with the temporary database location.
+    app_config.JOBS_DB_PATH = str(db_path)
+    app_db.JOBS_DB_PATH = str(db_path)
 
     app = create_app()
     app.testing = True
