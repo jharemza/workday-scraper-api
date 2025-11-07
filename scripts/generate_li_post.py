@@ -70,6 +70,7 @@ def _format_post(jobs: List[sqlite3.Row]) -> str:
         "I’m not affiliated with these institutions — just sharing to make someone’s search a little easier.",
         "",
         "📋 Current Openings:",
+        "",
         f"1️⃣ {jobs[0]['title']} — {jobs[0]['company']}",
         f"🔗 {jobs[0]['url']}",
         "",
@@ -111,5 +112,4 @@ def generate_li_post(db_path: str = JOBS_DB_PATH, output_dir: Path | None = None
 
 if __name__ == "__main__":
     content, path = generate_li_post()
-    print(content)
     print("\nSaved to:", path)
