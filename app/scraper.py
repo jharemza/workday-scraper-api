@@ -120,4 +120,4 @@ def run_scrape(companies=None):
         tqdm.write(f"  ✅ Inserted: {inserted}")
         tqdm.write(f"  🟡 Skipped : {skipped}")
         tqdm.write(f"  🔴 Deleted : {deleted}")
-        tqdm.write(f"  📦 Total   : {len(jobs)}")
+        tqdm.write(f"  📦 Total   : {len(jobs)}\n")
