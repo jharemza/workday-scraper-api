@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.24](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.24) - 2025-11-07
+
+<small>[Compare with v0.1.23](https://github.com/jharemza/workday-scraper-api/compare/v0.1.23...v0.1.24)</small>
+
+### Bug Fixes
+
+- add newline to total jobs summary output ([fb58f47](https://github.com/jharemza/workday-scraper-api/commit/fb58f4734a2528c31b91c03a2fea1990b818c339) by Jeremiah Haremza).
+
 ## [v0.1.23](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.23) - 2025-11-07
 
 <small>[Compare with v0.1.22](https://github.com/jharemza/workday-scraper-api/compare/v0.1.22...v0.1.23)</small>
