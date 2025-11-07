@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.2.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.0) - 2025-11-07
+
+<small>[Compare with v0.1.24](https://github.com/jharemza/workday-scraper-api/compare/v0.1.24...v0.2.0)</small>
+
+### Features
+
+- updated spacing in format_post and deleted post output to screen. ([62f1221](https://github.com/jharemza/workday-scraper-api/commit/62f1221aa4b4aa1af82f5ba801d66b557328daa4) by Jeremiah Haremza).
+- add script to generate linkedin job post ([0a33eab](https://github.com/jharemza/workday-scraper-api/commit/0a33eab1fc6d9a21564933834a33fc26caaf1f9a) by jharemza).
+
+### Chore
+
+- remove tracked files now covered by ignore rules ([ac18a0c](https://github.com/jharemza/workday-scraper-api/commit/ac18a0c0f32370f522c0e1109ea91e2f320ca1f7) by Jeremiah Haremza).
+- stopped tracking scripts and script ouput ([de654b4](https://github.com/jharemza/workday-scraper-api/commit/de654b40cc3ab8613ddf221ef9f9d9c33efde524) by Jeremiah Haremza).
+
 ## [v0.1.24](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.24) - 2025-11-07
 
 <small>[Compare with v0.1.23](https://github.com/jharemza/workday-scraper-api/compare/v0.1.23...v0.1.24)</small>
