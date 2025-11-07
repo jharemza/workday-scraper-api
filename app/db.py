@@ -61,7 +61,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS job_postings (
         id                          INTEGER PRIMARY KEY AUTOINCREMENT,
         company                     TEXT    NOT NULL,
-        workday_id                  TEXT    NOT NULL UNIQUE,
+        workday_id                  TEXT    NOT NULL,
         title                       TEXT,
         job_description             TEXT,
         location                    TEXT,
@@ -82,7 +82,8 @@ def init_db():
         questionnaire_id            TEXT,
         salary_low                  REAL,
         salary_high                 REAL,
-        date_scraped                TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        date_scraped                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company, workday_id)
     );
     """
     )
