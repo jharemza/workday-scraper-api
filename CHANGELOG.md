@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.1.23](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.23) - 2025-11-07
+
+<small>[Compare with v0.1.22](https://github.com/jharemza/workday-scraper-api/compare/v0.1.22...v0.1.23)</small>
+
+### Bug Fixes
+
+- remove unique constraint on workday_id and add composite unique constraint on company and workday_id ([184e10f](https://github.com/jharemza/workday-scraper-api/commit/184e10f56696c464a27a97aa4e3cccfcce72fa01) by Jeremiah Haremza).
+
 ## [v0.1.22](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.1.22) - 2025-10-28
 
 <small>[Compare with v0.1.21](https://github.com/jharemza/workday-scraper-api/compare/v0.1.21...v0.1.22)</small>
