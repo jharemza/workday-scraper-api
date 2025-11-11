@@ -48,7 +48,11 @@ def test_scrape_route(client, monkeypatch, tmp_path):
     monkeypatch.setattr(
         "app.scraper.load_institutions_config",
         lambda: [
-            {"name": company, "workday_url": "http://example.com/jobs", "search_text": ""}
+            {
+                "name": company,
+                "workday_url": "http://example.com/jobs",
+                "search_text": "",
+            }
         ],
     )
     monkeypatch.setattr(

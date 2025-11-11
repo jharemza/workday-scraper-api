@@ -268,13 +268,14 @@ def fetch_job_details(urls):
                 continue
 
             desc = job_data.get("jobDescription")
+            loc_info = job_data.get("jobRequisitionLocation", {})
             salary_low, salary_high = extract_salary_range(desc)
 
             job = {
                 "workday_id": job_data.get("id"),
                 "title": job_data.get("title"),
                 "job_description": desc,
-                "location": job_data.get("jobRequisitionLocation", {}).get("descriptor"),
+                "location": loc_info.get("descriptor"),
                 "url": job_data.get("externalUrl") or job_data.get("url"),
                 "posted_on": job_data.get("postedOn"),
                 "start_date": job_data.get("startDate"),
@@ -287,7 +288,7 @@ def fetch_job_details(urls):
                 "can_apply": bool(job_data.get("canApply")),
                 "posted": bool(job_data.get("posted")),
                 "include_resume_parsing": bool(job_data.get("includeResumeParsing")),
-                "job_requisition_location": job_data.get("jobRequisitionLocation", {}).get("descriptor"),
+                "job_requisition_location": loc_info.get("descriptor"),
                 "remote_type": job_data.get("remoteType"),
                 "questionnaire_id": job_data.get("questionnaireId"),
                 "salary_low": salary_low,

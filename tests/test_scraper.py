@@ -1,7 +1,10 @@
 import app.db as db
 import app.config as config
 from app.scraper import run_scrape
-from app.scraper_pkg.institution_runner import collect_listing_metadata, fetch_job_details
+from app.scraper_pkg.institution_runner import (
+    collect_listing_metadata,
+    fetch_job_details,
+)
 import app.scraper_pkg.config_loader as config_loader
 import app.scraper_pkg.institution_runner as runner
 
@@ -48,17 +51,13 @@ def test_collect_listing_metadata(monkeypatch):
         DummyResponse({"facets": []}),
         DummyResponse(
             {
-                "jobPostings": [
-                    {"externalPath": "job/REQ1", "bulletFields": ["REQ1"]}
-                ],
+                "jobPostings": [{"externalPath": "job/REQ1", "bulletFields": ["REQ1"]}],
                 "total": 2,
             }
         ),
         DummyResponse(
             {
-                "jobPostings": [
-                    {"externalPath": "job/REQ2", "bulletFields": ["REQ2"]}
-                ],
+                "jobPostings": [{"externalPath": "job/REQ2", "bulletFields": ["REQ2"]}],
                 "total": 2,
             }
         ),
@@ -204,7 +203,13 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
     monkeypatch.setattr("app.scraper.init_db", lambda: None)
     monkeypatch.setattr(
         "app.scraper.load_institutions_config",
-        lambda: [{"name": "Test", "workday_url": "http://example.com/jobs", "search_text": ""}],
+        lambda: [
+            {
+                "name": "Test",
+                "workday_url": "http://example.com/jobs",
+                "search_text": "",
+            }
+        ],
     )
 
     scraped_map = {
@@ -212,7 +217,9 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
         "REQ2": "http://example.com/job/REQ2",
     }
 
-    monkeypatch.setattr("app.scraper.collect_listing_metadata", lambda _cfg: scraped_map)
+    monkeypatch.setattr(
+        "app.scraper.collect_listing_metadata", lambda _cfg: scraped_map
+    )
     monkeypatch.setattr("app.scraper.get_existing_job_ids", lambda _company: {"REQ1"})
 
     def fake_fetch(urls):
