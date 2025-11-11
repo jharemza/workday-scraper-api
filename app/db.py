@@ -93,10 +93,10 @@ def init_db():
 def get_existing_job_ids(company):
     conn = _connect()
     rows = conn.execute(
-        "SELECT workday_id FROM job_postings WHERE company = ?", (company,)
+        "SELECT job_req_id FROM job_postings WHERE company = ?", (company,)
     ).fetchall()
     conn.close()
-    return {r["workday_id"] for r in rows}
+    return {r["job_req_id"] for r in rows}
 
 
 def insert_job_posting(
