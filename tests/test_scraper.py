@@ -1,7 +1,10 @@
 import app.db as db
 import app.config as config
 from app.scraper import run_scrape
-from app.scraper_pkg.institution_runner import run_institution_scraper
+from app.scraper_pkg.institution_runner import (
+    collect_listing_metadata,
+    fetch_job_details,
+)
 import app.scraper_pkg.config_loader as config_loader
 import app.scraper_pkg.institution_runner as runner
 
@@ -17,28 +20,56 @@ class DummyResponse:
         pass
 
 
-def test_run_institution_scraper(monkeypatch):
+def make_job(req_id, workday_id=None):
+    return {
+        "workday_id": workday_id or req_id.replace("REQ", "WD-"),
+        "title": f"Role {req_id}",
+        "job_description": "desc $50 - $60",
+        "location": "NY",
+        "url": f"http://example.com/job/{req_id}",
+        "posted_on": "2024-01-01",
+        "start_date": "2024-01-15",
+        "time_type": "Full time",
+        "job_req_id": req_id,
+        "job_posting_id": f"JP-{req_id}",
+        "job_posting_site_id": f"SITE-{req_id}",
+        "country": "US",
+        "logo_image": "logo.png",
+        "can_apply": True,
+        "posted": True,
+        "include_resume_parsing": False,
+        "job_requisition_location": "NY",
+        "remote_type": "Remote",
+        "questionnaire_id": f"Q-{req_id}",
+        "salary_low": 50.0,
+        "salary_high": 60.0,
+    }
+
+
+def test_collect_listing_metadata(monkeypatch):
     posts = [
         DummyResponse({"facets": []}),
-        DummyResponse({"jobPostings": [{"externalPath": "path/1"}], "total": 2}),
-        DummyResponse({"jobPostings": [{"externalPath": "path/2"}], "total": 2}),
+        DummyResponse(
+            {
+                "jobPostings": [{"externalPath": "job/REQ1", "bulletFields": ["REQ1"]}],
+                "total": 2,
+            }
+        ),
+        DummyResponse(
+            {
+                "jobPostings": [{"externalPath": "job/REQ2", "bulletFields": ["REQ2"]}],
+                "total": 2,
+            }
+        ),
     ]
 
     def mock_post(url, json=None, headers=None):
         return posts.pop(0)
 
-    gets = {
-        "http://example.com/job/1": DummyResponse({"jobPostingInfo": {"id": "1"}}),
-        "http://example.com/job/2": DummyResponse({"jobPostingInfo": {"id": "2"}}),
-    }
-
-    def mock_get(url, headers=None):
-        return gets[url]
-
     monkeypatch.setattr(runner.requests, "post", mock_post)
-    monkeypatch.setattr(runner.requests, "get", mock_get)
     monkeypatch.setattr(runner.time, "sleep", lambda *a, **k: None)
     monkeypatch.setattr(config, "SCRAPE_LIMIT", 1)
+
     inst = {
         "name": "Test",
         "workday_url": "http://example.com/jobs",
@@ -46,9 +77,78 @@ def test_run_institution_scraper(monkeypatch):
         "locations": [],
     }
 
-    jobs = run_institution_scraper(inst)
-    assert len(jobs) == 2
-    assert {j["id"] for j in jobs} == {"1", "2"}
+    metadata = collect_listing_metadata(inst)
+
+    assert metadata == {
+        "REQ1": "http://example.com/job/REQ1",
+        "REQ2": "http://example.com/job/REQ2",
+    }
+
+
+def test_fetch_job_details(monkeypatch):
+    responses = {
+        "http://example.com/job/REQ1": DummyResponse(
+            {
+                "jobPostingInfo": {
+                    "id": "WD-REQ1",
+                    "title": "Engineer",
+                    "jobDescription": "desc $50 - $60",
+                    "jobRequisitionLocation": {"descriptor": "NY"},
+                    "externalUrl": "http://example.com/job/REQ1",
+                    "postedOn": "2024-01-01",
+                    "startDate": "2024-02-01",
+                    "timeType": "Full",
+                    "jobReqId": "REQ1",
+                    "jobPostingId": "JP1",
+                    "jobPostingSiteId": "SITE1",
+                    "country": {"descriptor": "US"},
+                    "logoImage": {"src": "logo.png"},
+                    "canApply": True,
+                    "posted": True,
+                    "includeResumeParsing": False,
+                    "remoteType": "Remote",
+                    "questionnaireId": "Q1",
+                }
+            }
+        ),
+        "http://example.com/job/REQ2": DummyResponse(
+            {
+                "jobPostingInfo": {
+                    "id": "WD-REQ2",
+                    "title": "Engineer",
+                    "jobDescription": "desc $70 - $80",
+                    "jobRequisitionLocation": {"descriptor": "NY"},
+                    "externalUrl": "http://example.com/job/REQ2",
+                    "postedOn": "2024-01-01",
+                    "startDate": "2024-02-01",
+                    "timeType": "Full",
+                    "jobReqId": "REQ2",
+                    "jobPostingId": "JP2",
+                    "jobPostingSiteId": "SITE2",
+                    "country": {"descriptor": "US"},
+                    "logoImage": {"src": "logo.png"},
+                    "canApply": True,
+                    "posted": True,
+                    "includeResumeParsing": False,
+                    "remoteType": "Remote",
+                    "questionnaireId": "Q2",
+                }
+            }
+        ),
+    }
+
+    def mock_get(url, headers=None):
+        return responses[url]
+
+    monkeypatch.setattr(runner.requests, "get", mock_get)
+    monkeypatch.setattr(runner.time, "sleep", lambda *a, **k: None)
+
+    urls = list(responses.keys())
+    jobs = fetch_job_details(urls)
+
+    assert {job["job_req_id"] for job in jobs} == {"REQ1", "REQ2"}
+    assert jobs[0]["salary_low"] == 50.0
+    assert jobs[0]["salary_high"] == 60.0
 
 
 def test_run_scrape_db_ops(monkeypatch, tmp_path):
@@ -63,29 +163,37 @@ def test_run_scrape_db_ops(monkeypatch, tmp_path):
     }
     monkeypatch.setattr(config_loader, "load_institutions_config", lambda: [inst_cfg])
 
-    def first(_cfg):
-        return [
-            {"id": "1", "jobDescription": "desc $50 - $60"},
-            {"id": "2", "jobDescription": "desc"},
-        ]
+    metadata_runs = [
+        {
+            "REQ1": "http://example.com/job/REQ1",
+            "REQ2": "http://example.com/job/REQ2",
+        },
+        {
+            "REQ2": "http://example.com/job/REQ2",
+            "REQ3": "http://example.com/job/REQ3",
+        },
+    ]
 
-    monkeypatch.setattr(runner, "run_institution_scraper", first)
-    monkeypatch.setattr("app.scraper.run_institution_scraper", first)
-    run_scrape(["Test"])
+    def fake_collect(_cfg):
+        return metadata_runs.pop(0)
+
+    def fake_fetch(urls):
+        jobs = []
+        for url in urls:
+            req_id = url.split("/")[-1]
+            jobs.append(make_job(req_id, workday_id=f"WD-{req_id}"))
+        return jobs
+
+    monkeypatch.setattr("app.scraper.collect_listing_metadata", fake_collect)
+    monkeypatch.setattr("app.scraper.fetch_job_details", fake_fetch)
+
+    run_scrape([inst_cfg["name"]])
     rows = db.get_jobs_by_company("Test")
-    assert {r["workday_id"] for r in rows} == {"1", "2"}
+    assert {r["job_req_id"] for r in rows} == {"REQ1", "REQ2"}
 
-    def second(_cfg):
-        return [
-            {"id": "2", "jobDescription": "desc"},
-            {"id": "3", "jobDescription": "desc"},
-        ]
-
-    monkeypatch.setattr(runner, "run_institution_scraper", second)
-    monkeypatch.setattr("app.scraper.run_institution_scraper", second)
-    run_scrape(["Test"])
+    run_scrape([inst_cfg["name"]])
     rows = db.get_jobs_by_company("Test")
-    assert {r["workday_id"] for r in rows} == {"2", "3"}
+    assert {r["job_req_id"] for r in rows} == {"REQ2", "REQ3"}
 
 
 def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
@@ -94,18 +202,37 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
 
     monkeypatch.setattr("app.scraper.init_db", lambda: None)
     monkeypatch.setattr(
-        "app.scraper.load_institutions_config", lambda: [{"name": "Test"}]
+        "app.scraper.load_institutions_config",
+        lambda: [
+            {
+                "name": "Test",
+                "workday_url": "http://example.com/jobs",
+                "search_text": "",
+            }
+        ],
     )
-    jobs = [
-        {"id": "1", "jobDescription": "existing role"},
-        {"id": "2", "jobDescription": "new role"},
-    ]
-    monkeypatch.setattr("app.scraper.run_institution_scraper", lambda _cfg: jobs)
-    monkeypatch.setattr("app.scraper.get_existing_job_ids", lambda _company: {"1"})
 
-    def fake_insert(company, workday_id, *args, **kwargs):
+    scraped_map = {
+        "REQ1": "http://example.com/job/REQ1",
+        "REQ2": "http://example.com/job/REQ2",
+    }
+
+    monkeypatch.setattr(
+        "app.scraper.collect_listing_metadata", lambda _cfg: scraped_map
+    )
+    monkeypatch.setattr("app.scraper.get_existing_job_ids", lambda _company: {"REQ1"})
+
+    def fake_fetch(urls):
+        jobs = []
+        for url in urls:
+            req_id = url.split("/")[-1]
+            jobs.append(make_job(req_id, workday_id=f"WD-{req_id}"))
+        return jobs
+
+    def fake_insert(company, workday_id, **kwargs):
         inserted_ids.append((company, workday_id))
 
+    monkeypatch.setattr("app.scraper.fetch_job_details", fake_fetch)
     monkeypatch.setattr("app.scraper.insert_job_posting", fake_insert)
     monkeypatch.setattr("app.scraper.delete_job_posting", lambda *a, **k: None)
     monkeypatch.setattr(
@@ -118,11 +245,11 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
     skipped_line = next(line for line in captured_logs if "Skipped" in line)
     skipped_value = int(skipped_line.split(":")[-1].strip())
 
-    assert skipped_value == len(jobs) - inserted_count
+    assert skipped_value == len(scraped_map) - inserted_count
 
 
-def test_run_institution_scraper_facets_error(monkeypatch):
-    """If the initial POST request fails, an empty list should be returned."""
+def test_collect_listing_metadata_facets_error(monkeypatch):
+    """If the initial POST request fails, an empty dict should be returned."""
 
     def fail_post(*_args, **_kwargs):
         raise Exception("boom")
@@ -136,5 +263,5 @@ def test_run_institution_scraper_facets_error(monkeypatch):
         "locations": [],
     }
 
-    jobs = run_institution_scraper(inst)
-    assert jobs == []
+    metadata = collect_listing_metadata(inst)
+    assert metadata == {}

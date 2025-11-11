@@ -1,3 +1,12 @@
+"""
+Institution-level scraping utilities.
+
+Includes:
+  • Facet discovery and pagination for listing metadata.
+  • Job-detail fetching and normalization.
+  • Salary-range extraction helper.
+"""
+
 import requests
 import logging
 import time
@@ -84,16 +93,24 @@ def log_with_prefix(level, company_name, message):
     getattr(logging, level)(f"[{company_name}] {message}")
 
 
-def run_institution_scraper(institution: dict):
-    """Run scraping for a single institution."""
+def collect_listing_metadata(cfg):
+    """
+    Collect listing metadata (req_id → URL) for a single institution.
+
+    Uses Workday's JSON facet and pagination APIs to gather all active
+    job postings, applying optional location filters.
+
+    Returns:
+        dict[str, str]: Map of req_id → job URL.
+    """
 
     # 1. Set local vars from config
-    url = institution["workday_url"]
-    locations = institution.get("locations", [])
-    search_text = institution["search_text"]
-    company_name = institution["name"]
+    company_name = cfg["name"]
+    url = cfg["workday_url"]
+    locations = cfg.get("locations", [])
+    search_text = cfg["search_text"]
 
-    log_with_prefix("info", company_name, "🏁 Starting scrape.")
+    log_with_prefix("info", company_name, "🏁 Starting metadata collection.")
 
     # 2. Initial fetch for facets
     initial_payload = {
@@ -110,7 +127,7 @@ def run_institution_scraper(institution: dict):
         response.raise_for_status()
     except Exception as e:
         log_with_prefix("error", company_name, f"Failed to fetch facets: {e}")
-        return []
+        return {}
 
     facets = response.json().get("facets", [])
     location_ids = []
@@ -131,14 +148,14 @@ def run_institution_scraper(institution: dict):
             company_name,
             "No valid location IDs matched descriptors. Skipping.",
         )
-        return []
+        return {}
 
     # 3. Job collection
 
     # Initial variables
     offset = 0
     limit = config.SCRAPE_LIMIT
-    job_urls = []
+    scraped_map = {}
 
     applied_facets = {}
     if location_ids:
@@ -172,16 +189,12 @@ def run_institution_scraper(institution: dict):
     )
 
     # Collect URLs from first batch
-    first_jobs_data = [
-        (
-            f"{url.rsplit('/jobs', 1)[0]}/job/"
-            f"{job.get('externalPath', '').split('/')[-1]}"
-        )
-        for job in jobs_first_batch
-        if "externalPath" in job
-    ]
-
-    job_urls.extend(first_jobs_data)
+    for job in jobs_first_batch:
+        req_id = job.get("bulletFields", [None])[0]
+        ext_path = job.get("externalPath", "")
+        if req_id and ext_path:
+            job_url = f"{url.rsplit('/jobs', 1)[0]}/job/{ext_path.split('/')[-1]}"
+            scraped_map[req_id] = job_url
 
     page_pbar.update(1)
     offset += limit
@@ -206,47 +219,87 @@ def run_institution_scraper(institution: dict):
             break
 
         jobs = response.json().get("jobPostings", [])
-        jobs_data = [
-            (
-                f"{url.rsplit('/jobs', 1)[0]}/job/"
-                f"{job.get('externalPath', '').split('/')[-1]}"
-            )
-            for job in jobs
-            if "externalPath" in job
-        ]
 
-        if not jobs_data:
-            break
-
-        job_urls.extend(jobs_data)
+        for job in jobs:
+            req_id = job.get("bulletFields", [None])[0]
+            ext_path = job.get("externalPath", "")
+            if req_id and ext_path:
+                job_url = f"{url.rsplit('/jobs', 1)[0]}/job/{ext_path.split('/')[-1]}"
+                scraped_map[req_id] = job_url
 
         offset += limit
         page_pbar.update(1)
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     tqdm.write(f"\n📄 {company_name} Pagination Summary:")
-    tqdm.write(f"  🔍 Total job URLs collected: {len(job_urls)}")
-    tqdm.write(f"  📄 Total pages scraped: {page_pbar.n}")
+    tqdm.write(f"  🔍 Total job URLs to be collected: {len(scraped_map)}")
+    tqdm.write(f"  📄 Total pages to be scraped: {page_pbar.n}")
 
     page_pbar.close()
 
-    # 4. Job detail collection
+    return scraped_map
+
+
+def fetch_job_details(urls):
+    """
+    Fetch and normalize detailed job data for each URL.
+
+    Performs individual GET requests, extracts key fields expected by
+    insert_job_posting(), and parses salary ranges.
+
+    Args:
+        urls (Iterable[str]): Job posting URLs.
+
+    Returns:
+        list[dict]: Normalized job objects.
+    """
+
     job_postings = []
     for idx, url in tqdm(
-        enumerate(job_urls),
-        total=len(job_urls),
-        desc=f"{company_name}: Fetching job data",
+        enumerate(urls),
+        total=len(urls),
+        desc="Fetching job data",
     ):
         try:
             response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
             response.raise_for_status()
             job_data = response.json().get("jobPostingInfo")
-            if job_data:
-                job_postings.append(job_data)
+            if not job_data:
+                continue
+
+            desc = job_data.get("jobDescription")
+            loc_info = job_data.get("jobRequisitionLocation", {})
+            salary_low, salary_high = extract_salary_range(desc)
+
+            job = {
+                "workday_id": job_data.get("id"),
+                "title": job_data.get("title"),
+                "job_description": desc,
+                "location": loc_info.get("descriptor"),
+                "url": job_data.get("externalUrl") or job_data.get("url"),
+                "posted_on": job_data.get("postedOn"),
+                "start_date": job_data.get("startDate"),
+                "time_type": job_data.get("timeType"),
+                "job_req_id": job_data.get("jobReqId"),
+                "job_posting_id": job_data.get("jobPostingId"),
+                "job_posting_site_id": job_data.get("jobPostingSiteId"),
+                "country": job_data.get("country", {}).get("descriptor"),
+                "logo_image": job_data.get("logoImage", {}).get("src"),
+                "can_apply": bool(job_data.get("canApply")),
+                "posted": bool(job_data.get("posted")),
+                "include_resume_parsing": bool(job_data.get("includeResumeParsing")),
+                "job_requisition_location": loc_info.get("descriptor"),
+                "remote_type": job_data.get("remoteType"),
+                "questionnaire_id": job_data.get("questionnaireId"),
+                "salary_low": salary_low,
+                "salary_high": salary_high,
+            }
+            print(job["workday_id"], job["job_req_id"])
+            job_postings.append(job)
+
         except Exception as e:
-            log_with_prefix(
-                "error", company_name, f"Fetch job detail failed ({url}): {e}"
-            )
+            log_with_prefix("error", "GLOBAL", f"Fetch job detail failed ({url}): {e}")
+            continue
 
         time.sleep(0.5)
 

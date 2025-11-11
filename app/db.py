@@ -93,10 +93,10 @@ def init_db():
 def get_existing_job_ids(company):
     conn = _connect()
     rows = conn.execute(
-        "SELECT workday_id FROM job_postings WHERE company = ?", (company,)
+        "SELECT job_req_id FROM job_postings WHERE company = ?", (company,)
     ).fetchall()
     conn.close()
-    return {r["workday_id"] for r in rows}
+    return {r["job_req_id"] for r in rows}
 
 
 def insert_job_posting(
@@ -181,11 +181,30 @@ def insert_job_posting(
     conn.close()
 
 
-def delete_job_posting(company, workday_id):
+def delete_job_posting(company, workday_id=None, job_req_id=None):
+    """Delete a job posting for a company by identifier.
+
+    Args:
+        company (str): The company name used to scope the deletion.
+        workday_id (str | None): The Workday primary identifier for the posting.
+        job_req_id (str | None): The Workday requisition identifier.
+
+    Either ``workday_id`` or ``job_req_id`` must be provided. ``workday_id``
+    remains the default to preserve backwards compatibility with existing
+    callers, but ``job_req_id`` is now supported for flows that diff on the
+    requisition identifier.
+    """
+
+    if workday_id is None and job_req_id is None:
+        raise ValueError("Either workday_id or job_req_id is required")
+
+    column = "workday_id" if workday_id is not None else "job_req_id"
+    value = workday_id if workday_id is not None else job_req_id
+
     conn = _connect()
     conn.execute(
-        "DELETE FROM job_postings WHERE company = ? AND workday_id = ?",
-        (company, workday_id),
+        f"DELETE FROM job_postings WHERE company = ? AND {column} = ?",
+        (company, value),
     )
     conn.commit()
     conn.close()

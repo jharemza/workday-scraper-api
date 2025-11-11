@@ -1,5 +1,18 @@
 # app/scraper.py
 
+"""
+Orchestrates the full scraping workflow for all configured institutions.
+
+Flow:
+  1. Initialize database schema.
+  2. Collect listing metadata (req_id → URL).
+  3. Compute diff against existing DB entries.
+  4. Fetch details only for new postings.
+  5. Delete postings no longer present.
+
+This diff-based design minimizes redundant network requests.
+"""
+
 from app.db import (
     init_db,
     get_existing_job_ids,
@@ -7,19 +20,35 @@ from app.db import (
     delete_job_posting,
 )
 from app.scraper_pkg.config_loader import load_institutions_config
-from app.scraper_pkg.institution_runner import run_institution_scraper
+from app.scraper_pkg.institution_runner import (
+    collect_listing_metadata,
+    fetch_job_details,
+)
 from tqdm import tqdm
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def run_scrape(companies=None):
     """
+    Run the Workday scraper for one or more institutions.
+
+    Args:
+        companies (list[str] | None): Optional subset of company names to scrape.
+                                      If None, all configured institutions run.
+
+    Returns:
+        None. Inserts and deletes records in the local database.
+
     1. Ensure the DB schema exists.
     2. Load all institutions (or use provided list).
     3. For each company:
-       a. Run the vendored scraper.
-       b. Upsert new jobs.
-       c. Delete missing jobs.
-    Returns a summary dict.
+       a. Collect listing metadata only.
+       b. Diffing.
+       c. Fetch details only for inserted.
+       d. Delete stale postings.
     """
     # 1. Bootstrap DB
     init_db()
@@ -27,97 +56,48 @@ def run_scrape(companies=None):
     # 2. Determine target companies
     all_insts = load_institutions_config()
     inst_names = [inst["name"] for inst in all_insts]
-
-    if companies:
-        targets = companies
-    else:
-        targets = inst_names
+    targets = companies or inst_names
 
     # 3. Loop and scrape
     for company in targets:
-        # 3a. Find config for this company
-        cfg = next((i for i in all_insts if i["name"] == company), None)
-        if cfg is None:
-            # Fallback minimal config
-            cfg = {"name": company}
+        cfg = next((i for i in all_insts if i["name"] == company), {"name": company})
+        logger.info(f"Starting scrape for {company}")
 
-        # 3b. Run the original scraper logic
-        jobs = run_institution_scraper(cfg)
-        # jobs: list of dicts with keys id, title, location, url, date_posted
+        # 3a. Collect listing metadata only.
+        scraped_map = collect_listing_metadata(cfg)
+        scraped_ids = set(scraped_map.keys())
 
-        # 3c. Determine existing vs. scraped IDs (use the 'id' field)
-        existing = get_existing_job_ids(company)
-        scraped = {j["id"] for j in jobs}
+        # 3b. Diffing
+        # Compute set-based diffs to identify inserted/deleted postings
+        db_ids = set(get_existing_job_ids(company))
+        inserted_ids = scraped_ids - db_ids
+        deleted_ids = db_ids - scraped_ids
+        skipped_count = len(scraped_ids) - len(inserted_ids)
+        logger.info(
+            f"📊 {company} Summary:\n"
+            f"  ✅ Inserted: {len(inserted_ids)}\n"
+            f"  🟡 Skipped : {skipped_count}\n"
+            f"  🔴 Deleted : {len(deleted_ids)}\n"
+            f"  📦 Total   : {len(scraped_ids)}\n"
+        )
 
-        # 3d. Insert new postings
-        inserted = 0
-        # inside the for‐job loop in run_scrape:
+        # 3c. Fetch details only for jobs to be inserted.
+        # Fetch and insert details for new postings only
+        if inserted_ids:
+            inserted_urls = [scraped_map[i] for i in inserted_ids]
+            new_jobs = fetch_job_details(inserted_urls)
+            for job in new_jobs:
+                insert_job_posting(company, **job)
 
-        for job in jobs:
-            wid = job["id"]
-            title = job.get("title")
-            desc = job.get("jobDescription")
-            loc = job.get("jobRequisitionLocation", {}).get("descriptor") or job.get(
-                "location", {}
-            ).get("descriptor")
-            url = job.get("externalUrl") or job.get("url")
-            posted_on = job.get("postedOn")
-            start_date = job.get("startDate")
-            time_type = job.get("timeType")
-            req_id = job.get("jobReqId")
-            post_id = job.get("jobPostingId")
-            site_id = job.get("jobPostingSiteId")
-            country = job.get("country", {}).get("descriptor")
-            logo = job.get("logoImage", {}).get("src")
-            can_apply = bool(job.get("canApply"))
-            posted = bool(job.get("posted"))
-            include_resume = bool(job.get("includeResumeParsing"))
-            job_loc = job.get("jobRequisitionLocation", {}).get("descriptor")
-            remote = job.get("remoteType")
-            q_id = job.get("questionnaireId")
+        # 3d. Delete stale postings
+        # Remove postings no longer listed in the source
+        for req_id in deleted_ids:
+            delete_job_posting(company, job_req_id=req_id)
 
-            # salary parsing
-            from app.scraper_pkg.institution_runner import extract_salary_range
-
-            salary_low, salary_high = extract_salary_range(desc)
-
-            if wid not in existing:
-                insert_job_posting(
-                    company,
-                    wid,
-                    title,
-                    desc,
-                    loc,
-                    url,
-                    posted_on,
-                    start_date,
-                    time_type,
-                    req_id,
-                    post_id,
-                    site_id,
-                    country,
-                    logo,
-                    can_apply,
-                    posted,
-                    include_resume,
-                    job_loc,
-                    remote,
-                    q_id,
-                    salary_low,
-                    salary_high,
-                )
-                inserted += 1
-
-            # 3e. Delete stale postings
-            deleted = 0
-            for old_id in existing - scraped:
-                delete_job_posting(company, old_id)
-                deleted += 1
-
-            skipped = len(jobs) - inserted
+        logger.info(f"Completed scrape for {company}")
 
         tqdm.write(f"\n📊 {company} Summary:")
-        tqdm.write(f"  ✅ Inserted: {inserted}")
-        tqdm.write(f"  🟡 Skipped : {skipped}")
-        tqdm.write(f"  🔴 Deleted : {deleted}")
-        tqdm.write(f"  📦 Total   : {len(jobs)}\n")
+        tqdm.write(f"  ✅ Inserted: {len(inserted_ids)}")
+        tqdm.write(f"  🟡 Skipped : {skipped_count}")
+        tqdm.write(f"  🔴 Deleted : {len(deleted_ids)}")
+        tqdm.write(f"  📦 Total   : {len(scraped_ids)}\n")

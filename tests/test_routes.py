@@ -39,14 +39,56 @@ def test_jobs_company_new(client):
 
 
 def test_scrape_route(client, monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        "app.scraper.run_institution_scraper",
-        lambda cfg: [{"id": "1", "jobDescription": ""}],
-    )
-    monkeypatch.setattr(config, "JOBS_DB_PATH", str(tmp_path / "route.db"))
-    monkeypatch.setattr(db, "JOBS_DB_PATH", str(tmp_path / "route.db"))
+    db_path = tmp_path / "route.db"
+    monkeypatch.setattr(config, "JOBS_DB_PATH", str(db_path))
+    monkeypatch.setattr(db, "JOBS_DB_PATH", str(db_path))
 
     company = "M&T Bank"
+
+    monkeypatch.setattr(
+        "app.scraper.load_institutions_config",
+        lambda: [
+            {
+                "name": company,
+                "workday_url": "http://example.com/jobs",
+                "search_text": "",
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        "app.scraper.collect_listing_metadata",
+        lambda cfg: {"REQ1": "http://example.com/job/REQ1"},
+    )
+
+    def fake_fetch(urls):
+        return [
+            {
+                "workday_id": "1",
+                "title": "Role",
+                "job_description": "desc",
+                "location": "NY",
+                "url": urls[0],
+                "posted_on": "2024-01-01",
+                "start_date": "2024-01-15",
+                "time_type": "Full",
+                "job_req_id": "REQ1",
+                "job_posting_id": "JP1",
+                "job_posting_site_id": "SITE1",
+                "country": "US",
+                "logo_image": "logo.png",
+                "can_apply": True,
+                "posted": True,
+                "include_resume_parsing": False,
+                "job_requisition_location": "NY",
+                "remote_type": "Remote",
+                "questionnaire_id": "Q1",
+                "salary_low": 50.0,
+                "salary_high": 60.0,
+            }
+        ]
+
+    monkeypatch.setattr("app.scraper.fetch_job_details", fake_fetch)
+
     res = client.get(f"/jobs/company/{company}")
     assert res.status_code == 202
 

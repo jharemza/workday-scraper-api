@@ -1,20 +1,10 @@
 import app.scraper_pkg.institution_runner as runner
-from app.scraper_pkg.institution_runner import run_institution_scraper
-
-
-class DummyResponse:
-    def __init__(self, payload):
-        self.payload = payload
-
-    def json(self):
-        return self.payload
-
-    def raise_for_status(self):
-        pass
+from app.scraper_pkg.institution_runner import collect_listing_metadata
+from tests.test_scraper import DummyResponse
 
 
 def test_unmatched_location_facets(monkeypatch):
-    """Return empty list when location descriptors don't match facets."""
+    """Return empty dict when location descriptors don't match facets."""
 
     def mock_post(url, json=None, headers=None):
         payload = {
@@ -37,5 +27,5 @@ def test_unmatched_location_facets(monkeypatch):
         "locations": ["New York"],
     }
 
-    jobs = run_institution_scraper(inst)
-    assert jobs == []
+    metadata = collect_listing_metadata(inst)
+    assert metadata == {}
