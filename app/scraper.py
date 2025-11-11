@@ -92,7 +92,7 @@ def run_scrape(companies=None):
         # 3d. Delete stale postings
         # Remove postings no longer listed in the source
         for req_id in deleted_ids:
-            delete_job_posting(company, req_id)
+            delete_job_posting(company, job_req_id=req_id)
 
         logger.info(f"Completed scrape for {company}")
 

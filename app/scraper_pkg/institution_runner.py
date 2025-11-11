@@ -127,7 +127,7 @@ def collect_listing_metadata(cfg):
         response.raise_for_status()
     except Exception as e:
         log_with_prefix("error", company_name, f"Failed to fetch facets: {e}")
-        return []
+        return {}
 
     facets = response.json().get("facets", [])
     location_ids = []
@@ -148,7 +148,7 @@ def collect_listing_metadata(cfg):
             company_name,
             "No valid location IDs matched descriptors. Skipping.",
         )
-        return []
+        return {}
 
     # 3. Job collection
 

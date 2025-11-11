@@ -47,5 +47,9 @@ def test_insert_retrieve_delete(temp_db):
     today_jobs = db.get_jobs_today()
     assert len(today_jobs) == 1
 
-    db.delete_job_posting("TestCo", "WD123")
+    db.delete_job_posting("TestCo", job_req_id="REQ1")
+    assert db.get_all_jobs() == []
+
+    db.insert_job_posting(**sample)
+    db.delete_job_posting("TestCo", workday_id="WD123")
     assert db.get_all_jobs() == []
