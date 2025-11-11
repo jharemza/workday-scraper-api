@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.2.1](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.1) - 2025-11-11
+
+<small>[Compare with v0.2.0](https://github.com/jharemza/workday-scraper-api/compare/v0.2.0...v0.2.1)</small>
+
+### Style
+
+- apply formatting and line-length fixes across codebase ([41f3c41](https://github.com/jharemza/workday-scraper-api/commit/41f3c410806d959fd38c2f34fcae55666dbbffee) by Jeremiah Haremza).
+
+### Code Refactoring
+
+- implement diff-based scraper filtering and align ID fields ([2e879d2](https://github.com/jharemza/workday-scraper-api/commit/2e879d2fa812b67dc4d9fae89ef4096398891a54) by Jeremiah Haremza). Related issues/PRs: [#36](https://github.com/jharemza/workday-scraper-api/issues/36)
+
 ## [v0.2.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.0) - 2025-11-07
 
 <small>[Compare with v0.1.24](https://github.com/jharemza/workday-scraper-api/compare/v0.1.24...v0.2.0)</small>
