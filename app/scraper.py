@@ -88,10 +88,12 @@ def run_scrape(companies=None):
 
         logger.info(f"Completed scrape for {company}")
 
-        logger.info(
+        summary = (
             f"📊 {company} Summary:\n"
             f"  ✅ Inserted: {len(inserted_ids)}\n"
             f"  🟡 Skipped : {skipped_count}\n"
             f"  🔴 Deleted : {len(deleted_ids)}\n"
             f"  📦 Total   : {len(scraped_ids)}\n"
         )
+        logger.info(summary)
+
