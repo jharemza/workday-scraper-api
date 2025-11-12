@@ -73,6 +73,13 @@ def run_scrape(companies=None):
         inserted_ids = scraped_ids - db_ids
         deleted_ids = db_ids - scraped_ids
         skipped_count = len(scraped_ids) - len(inserted_ids)
+        logger.info(
+            f"📊 {company} Summary:\n"
+            f"  ✅ Inserted: {len(inserted_ids)}\n"
+            f"  🟡 Skipped : {skipped_count}\n"
+            f"  🔴 Deleted : {len(deleted_ids)}\n"
+            f"  📦 Total   : {len(scraped_ids)}\n"
+        )
 
         # 3c. Fetch details only for jobs to be inserted.
         # Fetch and insert details for new postings only
@@ -89,10 +96,8 @@ def run_scrape(companies=None):
 
         logger.info(f"Completed scrape for {company}")
 
-        logger.info(
-            f"📊 {company} Summary:\n"
-            f"  ✅ Inserted: {len(inserted_ids)}\n"
-            f"  🟡 Skipped : {skipped_count}\n"
-            f"  🔴 Deleted : {len(deleted_ids)}\n"
-            f"  📦 Total   : {len(scraped_ids)}\n"
-        )
+        tqdm.write(f"\n📊 {company} Summary:")
+        tqdm.write(f"  ✅ Inserted: {len(inserted_ids)}")
+        tqdm.write(f"  🟡 Skipped : {skipped_count}")
+        tqdm.write(f"  🔴 Deleted : {len(deleted_ids)}")
+        tqdm.write(f"  📦 Total   : {len(scraped_ids)}\n")
