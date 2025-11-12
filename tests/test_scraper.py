@@ -198,7 +198,15 @@ def test_run_scrape_db_ops(monkeypatch, tmp_path):
 
 def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
     inserted_ids = []
-    captured_logs = []
+
+    class DummyLogger:
+        def __init__(self):
+            self.messages = []
+
+        def info(self, message):
+            self.messages.append(message)
+
+    dummy_logger = DummyLogger()
 
     monkeypatch.setattr("app.scraper.init_db", lambda: None)
     monkeypatch.setattr(
@@ -235,14 +243,15 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
     monkeypatch.setattr("app.scraper.fetch_job_details", fake_fetch)
     monkeypatch.setattr("app.scraper.insert_job_posting", fake_insert)
     monkeypatch.setattr("app.scraper.delete_job_posting", lambda *a, **k: None)
-    monkeypatch.setattr(
-        "app.scraper.tqdm.write", lambda message: captured_logs.append(message)
-    )
+    monkeypatch.setattr("app.scraper.logger", dummy_logger)
 
     run_scrape(["Test"])
 
     inserted_count = len(inserted_ids)
-    skipped_line = next(line for line in captured_logs if "Skipped" in line)
+    summary_entry = next(msg for msg in dummy_logger.messages if "Skipped" in msg)
+    skipped_line = next(
+        line for line in summary_entry.splitlines() if "Skipped" in line
+    )
     skipped_value = int(skipped_line.split(":")[-1].strip())
 
     assert skipped_value == len(scraped_map) - inserted_count
