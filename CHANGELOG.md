@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.2.3](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.3) - 2025-11-12
+
+<small>[Compare with v0.2.2](https://github.com/jharemza/workday-scraper-api/compare/v0.2.2...v0.2.3)</small>
+
+### Chore
+
+- finalize terminal and logfile output cleanup with updated tests ([cf14599](https://github.com/jharemza/workday-scraper-api/commit/cf14599208c617d57f713592cfc6eefb5da3f3b7) by jharemza).
+- format cleanup on scraper.py ([18ddf76](https://github.com/jharemza/workday-scraper-api/commit/18ddf7614b6e2b203178681f7391fd9c5d8b2426) by Jeremiah Haremza).
+- enhance logging with summary details for each company scrape ([4eddb50](https://github.com/jharemza/workday-scraper-api/commit/4eddb50cf7e6307badb7c14948f3cdcea4ae60f0) by Jeremiah Haremza).
+- clean up terminal and logfile output and update tests ([fc2febf](https://github.com/jharemza/workday-scraper-api/commit/fc2febf172130096cb7247ae3e35f5c0e3c0fca9) by Jeremiah Haremza).
+
 ## [v0.2.2](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.2) - 2025-11-12
 
 <small>[Compare with v0.2.1](https://github.com/jharemza/workday-scraper-api/compare/v0.2.1...v0.2.2)</small>
