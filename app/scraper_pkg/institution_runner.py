@@ -294,7 +294,7 @@ def fetch_job_details(urls):
                 "salary_low": salary_low,
                 "salary_high": salary_high,
             }
-            print(job["workday_id"], job["job_req_id"])
+
             job_postings.append(job)
 
         except Exception as e:
