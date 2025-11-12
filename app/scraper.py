@@ -96,4 +96,3 @@ def run_scrape(companies=None):
             f"  📦 Total   : {len(scraped_ids)}\n"
         )
         logger.info(summary)
-
