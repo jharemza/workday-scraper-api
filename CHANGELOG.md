@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.2.4](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.4) - 2025-11-14
+
+<small>[Compare with v0.2.3](https://github.com/jharemza/workday-scraper-api/compare/v0.2.3...v0.2.4)</small>
+
+### Chore
+
+- update institutions.yaml with new entries and removed location filtering ([1d6c2ef](https://github.com/jharemza/workday-scraper-api/commit/1d6c2efb9e7773bfc43f39593890ef304c2d2e65) by Jeremiah Haremza).
+
 ## [v0.2.3](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.3) - 2025-11-12
 
 <small>[Compare with v0.2.2](https://github.com/jharemza/workday-scraper-api/compare/v0.2.2...v0.2.3)</small>
