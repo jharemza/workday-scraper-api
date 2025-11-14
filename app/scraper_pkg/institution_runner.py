@@ -183,6 +183,9 @@ def collect_listing_metadata(cfg):
     total = data.get("total", 0)
     total_pages = math.ceil(total / limit)
 
+    log_with_prefix("info", company_name, f"Total job postings found: {total}")
+    log_with_prefix("info", company_name, f"Total pages to scrape: {total_pages}")
+
     # Initialize your progress bar with known total_pages
     page_pbar = tqdm(
         desc=f"{company_name}: Pages scraped", unit="page", total=total_pages
@@ -231,9 +234,12 @@ def collect_listing_metadata(cfg):
         page_pbar.update(1)
         time.sleep(0.1)
 
-    tqdm.write(f"\n📄 {company_name} Pagination Summary:")
-    tqdm.write(f"  🔍 Total job URLs to be collected: {len(scraped_map)}")
-    tqdm.write(f"  📄 Total pages to be scraped: {page_pbar.n}")
+    sm_count = len(scraped_map)
+    msg = f"Total job URLs collected: {sm_count}"
+
+    log_with_prefix("info", company_name, "🏁 Metadata collection complete.")
+    log_with_prefix("info", company_name, msg)
+    log_with_prefix("info", company_name, f"Total pages scraped: {page_pbar.n}")
 
     page_pbar.close()
 
