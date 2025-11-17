@@ -81,3 +81,35 @@ institutions:
   - name: "First Rand"
     workday_url: "https://firstrand.wd3.myworkdayjobs.com/wday/cxs/firstrand/FRB/jobs"
     search_text: "sql"
+
+  - name: "Santander Bank"
+    workday_url: "https://santander.wd3.myworkdayjobs.com/wday/cxs/santander/SantanderCareers/jobs"
+    search_text: "sql"
+
+  - name: "Deutsche Bank"
+    workday_url: "https://db.wd3.myworkdayjobs.com/wday/cxs/db/DBWebsite/jobs"
+    search_text: "sql"
+
+  - name: "Aberdeen"
+    workday_url: "https://abrdn.wd3.myworkdayjobs.com/wday/cxs/abrdn/abrdn/jobs"
+    search_text: "sql"
+
+  - name: "Black Rock"
+    workday_url: "https://blackrock.wd1.myworkdayjobs.com/wday/cxs/blackrock/BlackRock_Professional/jobs"
+    search_text: "sql"
+
+  - name: "Fannie Mae"
+    workday_url: "https://fanniemae.wd1.myworkdayjobs.com/wday/cxs/fanniemae/FannieMaeCareers/jobs"
+    search_text: "sql"
+
+  - name: "Fiserv"
+    workday_url: "https://fanniemae.wd1.myworkdayjobs.com/wday/cxs/fanniemae/FannieMaeCareers/jobs"
+    search_text: "sql"
+
+  - name: "The Hartford"
+    workday_url: "https://thehartford.wd5.myworkdayjobs.com/wday/cxs/thehartford/Careers_External/jobs"
+    search_text: "sql"
+
+  - name: "Franklin Templeton"
+    workday_url: "https://franklintempleton.wd5.myworkdayjobs.com/wday/cxs/franklintempleton/Primary-External-1/jobs"
+    search_text: "sql"
