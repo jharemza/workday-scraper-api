@@ -85,6 +85,50 @@ def test_collect_listing_metadata(monkeypatch):
     }
 
 
+def test_collect_listing_metadata_first_rand_fallback(monkeypatch):
+    posts = [
+        DummyResponse({"facets": []}),
+        DummyResponse(
+            {
+                "jobPostings": [
+                    {
+                        "externalPath": "job/REQ3",
+                        "bulletFields": ["BF1", "BF2", "REQ3"],
+                    },
+                    {
+                        "externalPath": "job/REQ4",
+                        "bulletFields": ["REQ4_ONLY"],
+                    },
+                    {"externalPath": "job/NOBULLET", "bulletFields": []},
+                    {"externalPath": "job/NOKEY"},
+                ],
+                "total": 4,
+            }
+        ),
+    ]
+
+    def mock_post(url, json=None, headers=None):
+        return posts.pop(0)
+
+    monkeypatch.setattr(runner.requests, "post", mock_post)
+    monkeypatch.setattr(runner.time, "sleep", lambda *a, **k: None)
+    monkeypatch.setattr(config, "SCRAPE_LIMIT", 10)
+
+    inst = {
+        "name": "First Rand",
+        "workday_url": "http://example.com/jobs",
+        "search_text": "",
+        "locations": [],
+    }
+
+    metadata = collect_listing_metadata(inst)
+
+    assert metadata == {
+        "REQ3": "http://example.com/job/REQ3",
+        "REQ4_ONLY": "http://example.com/job/REQ4",
+    }
+
+
 def test_fetch_job_details(monkeypatch):
     responses = {
         "http://example.com/job/REQ1": DummyResponse(

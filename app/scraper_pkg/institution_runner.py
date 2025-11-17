@@ -191,9 +191,18 @@ def collect_listing_metadata(cfg):
         desc=f"{company_name}: Pages scraped", unit="page", total=total_pages
     )
 
+    def extract_req_id(job_posting):
+        bullet_fields = job_posting.get("bulletFields") or []
+
+        if company_name == "First Rand" and len(bullet_fields) > 2:
+            return bullet_fields[2] or (bullet_fields[0] if bullet_fields else None)
+
+        return bullet_fields[0] if bullet_fields else None
+
     # Collect URLs from first batch
     for job in jobs_first_batch:
-        req_id = job.get("bulletFields", [None])[0]
+        req_id = extract_req_id(job)
+
         ext_path = job.get("externalPath", "")
         if req_id and ext_path:
             job_url = f"{url.rsplit('/jobs', 1)[0]}/job/{ext_path.split('/')[-1]}"
@@ -224,7 +233,8 @@ def collect_listing_metadata(cfg):
         jobs = response.json().get("jobPostings", [])
 
         for job in jobs:
-            req_id = job.get("bulletFields", [None])[0]
+            req_id = extract_req_id(job)
+
             ext_path = job.get("externalPath", "")
             if req_id and ext_path:
                 job_url = f"{url.rsplit('/jobs', 1)[0]}/job/{ext_path.split('/')[-1]}"
