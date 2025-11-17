@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.2.6](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.6) - 2025-11-17
+
+<small>[Compare with v0.2.5](https://github.com/jharemza/workday-scraper-api/compare/v0.2.5...v0.2.6)</small>
+
+### Bug Fixes
+
+- adjust req_id extraction for First Rand company in collect_listing_metadata ([cf1ec79](https://github.com/jharemza/workday-scraper-api/commit/cf1ec79361a2f107e64eb6c910fa7dbf16b4dcda) by Jeremiah Haremza).
+
 ## [v0.2.5](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.5) - 2025-11-14
 
 <small>[Compare with v0.2.4](https://github.com/jharemza/workday-scraper-api/compare/v0.2.4...v0.2.5)</small>
