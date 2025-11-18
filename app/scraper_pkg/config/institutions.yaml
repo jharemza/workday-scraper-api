@@ -81,3 +81,103 @@ institutions:
   - name: "First Rand"
     workday_url: "https://firstrand.wd3.myworkdayjobs.com/wday/cxs/firstrand/FRB/jobs"
     search_text: "sql"
+
+  - name: "Santander Bank"
+    workday_url: "https://santander.wd3.myworkdayjobs.com/wday/cxs/santander/SantanderCareers/jobs"
+    search_text: "sql"
+
+  - name: "Deutsche Bank"
+    workday_url: "https://db.wd3.myworkdayjobs.com/wday/cxs/db/DBWebsite/jobs"
+    search_text: "sql"
+
+  - name: "Aberdeen"
+    workday_url: "https://abrdn.wd3.myworkdayjobs.com/wday/cxs/abrdn/abrdn/jobs"
+    search_text: "sql"
+
+  - name: "Black Rock"
+    workday_url: "https://blackrock.wd1.myworkdayjobs.com/wday/cxs/blackrock/BlackRock_Professional/jobs"
+    search_text: "sql"
+
+  - name: "Fannie Mae"
+    workday_url: "https://fanniemae.wd1.myworkdayjobs.com/wday/cxs/fanniemae/FannieMaeCareers/jobs"
+    search_text: "sql"
+
+  - name: "Fiserv"
+    workday_url: "https://fiserv.wd5.myworkdayjobs.com/wday/cxs/fiserv/EXT/jobs"
+    search_text: "sql"
+
+  - name: "The Hartford"
+    workday_url: "https://thehartford.wd5.myworkdayjobs.com/wday/cxs/thehartford/Careers_External/jobs"
+    search_text: "sql"
+
+  - name: "Franklin Templeton"
+    workday_url: "https://franklintempleton.wd5.myworkdayjobs.com/wday/cxs/franklintempleton/Primary-External-1/jobs"
+    search_text: "sql"
+
+  - name: "American Family Insurance"
+    workday_url: "https://amfam.wd1.myworkdayjobs.com/wday/cxs/amfam/Careers/jobs"
+    search_text: "sql"
+
+  - name: "Assurant"
+    workday_url: "https://assurant.wd1.myworkdayjobs.com/wday/cxs/assurant/Assurant_Careers/jobs"
+    search_text: "sql"
+
+  - name: "LPL Financial"
+    workday_url: "https://lplfinancial.wd1.myworkdayjobs.com/wday/cxs/lplfinancial/External/jobs"
+    search_text: "sql"
+
+  - name: "MassMututal"
+    workday_url: "https://massmutual.wd1.myworkdayjobs.com/wday/cxs/massmutual/MMCareers/jobs"
+    search_text: "sql"
+
+  - name: "MasterCard"
+    workday_url: " https://mastercard.wd1.myworkdayjobs.com/wday/cxs/mastercard/CorporateCareers/jobs"
+    search_text: "sql"
+
+  - name: "Pacific Life"
+    workday_url: "https://pacificlife.wd1.myworkdayjobs.com/wday/cxs/pacificlife/PacificLifeCareers/jobs"
+    search_text: "sql"
+
+  - name: "Regions Bank"
+    workday_url: "https://regions.wd5.myworkdayjobs.com/wday/cxs/regions/Regions_Careers/jobs"
+    search_text: "sql"
+
+  - name: "RGA"
+    workday_url: "https://rgare.wd1.myworkdayjobs.com/wday/cxs/rgare/Careers/jobs"
+    search_text: "sql"
+
+  - name: "Synchrony Financial"
+    workday_url: "https://synchronyfinancial.wd5.myworkdayjobs.com/wday/cxs/synchronyfinancial/careers/jobs"
+    search_text: "sql"
+
+  - name: "Guardian Life"
+    workday_url: "https://guardianlife.wd5.myworkdayjobs.com/wday/cxs/guardianlife/Guardian-Life-Careers/jobs"
+    search_text: "sql"
+
+  - name: "Prudential"
+    workday_url: "https://pru.wd5.myworkdayjobs.com/wday/cxs/pru/Careers/jobs"
+    search_text: "sql"
+
+  - name: "Capital Group"
+    workday_url: "https://capgroup.wd1.myworkdayjobs.com/wday/cxs/capgroup/capitalgroupcareers/jobs"
+    search_text: "sql"
+
+  - name: "Travelers"
+    workday_url: "https://travelers.wd5.myworkdayjobs.com/wday/cxs/travelers/External/jobs"
+    search_text: "sql"
+
+  - name: "Vanguard"
+    workday_url: "https://vanguard.wd5.myworkdayjobs.com/wday/cxs/vanguard/vanguard_external/jobs"
+    search_text: "sql"
+
+  - name: "Truist"
+    workday_url: "https://truist.wd1.myworkdayjobs.com/wday/cxs/truist/Careers/jobs"
+    search_text: "sql"
+
+  - name: "TIAA"
+    workday_url: "https://tiaa.wd1.myworkdayjobs.com/wday/cxs/tiaa/Search/jobs"
+    search_text: "sql"
+
+  - name: "Allstate"
+    workday_url: "https://allstate.wd5.myworkdayjobs.com/wday/cxs/allstate/allstate_careers/jobs"
+    search_text: "sql"
