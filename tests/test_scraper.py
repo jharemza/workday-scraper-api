@@ -129,6 +129,41 @@ def test_collect_listing_metadata_first_rand_fallback(monkeypatch):
     }
 
 
+def test_collect_listing_metadata_raymond_james(monkeypatch):
+    posts = [
+        DummyResponse({"facets": []}),
+        DummyResponse(
+            {
+                "jobPostings": [
+                    {
+                        "externalPath": "job/REQRJ",
+                        "bulletFields": ["IGNORE", "REQRJ"],
+                    }
+                ],
+                "total": 1,
+            }
+        ),
+    ]
+
+    def mock_post(url, json=None, headers=None):
+        return posts.pop(0)
+
+    monkeypatch.setattr(runner.requests, "post", mock_post)
+    monkeypatch.setattr(runner.time, "sleep", lambda *a, **k: None)
+    monkeypatch.setattr(config, "SCRAPE_LIMIT", 10)
+
+    inst = {
+        "name": "Raymond James",
+        "workday_url": "http://example.com/jobs",
+        "search_text": "",
+        "locations": [],
+    }
+
+    metadata = collect_listing_metadata(inst)
+
+    assert metadata == {"REQRJ": "http://example.com/job/REQRJ"}
+
+
 def test_fetch_job_details(monkeypatch):
     responses = {
         "http://example.com/job/REQ1": DummyResponse(
