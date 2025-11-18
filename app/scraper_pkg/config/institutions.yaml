@@ -103,7 +103,7 @@ institutions:
     search_text: "sql"
 
   - name: "Fiserv"
-    workday_url: "https://fanniemae.wd1.myworkdayjobs.com/wday/cxs/fanniemae/FannieMaeCareers/jobs"
+    workday_url: "https://fiserv.wd5.myworkdayjobs.com/wday/cxs/fiserv/EXT/jobs"
     search_text: "sql"
 
   - name: "The Hartford"
@@ -147,7 +147,7 @@ institutions:
     search_text: "sql"
 
   - name: "Synchrony Financial"
-    workday_url: "hhttps://synchronyfinancial.wd5.myworkdayjobs.com/wday/cxs/synchronyfinancial/careers/jobs"
+    workday_url: "https://synchronyfinancial.wd5.myworkdayjobs.com/wday/cxs/synchronyfinancial/careers/jobs"
     search_text: "sql"
 
   - name: "Guardian Life"
