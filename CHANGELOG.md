@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.3.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.3.0) - 2025-11-18
+
+<small>[Compare with v0.2.6](https://github.com/jharemza/workday-scraper-api/compare/v0.2.6...v0.3.0)</small>
+
+### Features
+
+- add multiple new institutions to the configuration ([dbd037f](https://github.com/jharemza/workday-scraper-api/commit/dbd037fa1e67c539061bf4bb7a2f54509a76ddf5) by Jeremiah Haremza).
+- add new institutions to the configuration ([bcc21ad](https://github.com/jharemza/workday-scraper-api/commit/bcc21adac784f1ace1a9b31a4ed940dd9e119676) by Jeremiah Haremza).
+
+### Bug Fixes
+
+- update workday URLs for Fiserv and Synchrony Financial ([1936354](https://github.com/jharemza/workday-scraper-api/commit/19363548fd2d8796a7f6a9c3207ef3874dc486a1) by Jeremiah Haremza).
+
 ## [v0.2.6](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.2.6) - 2025-11-17
 
 <small>[Compare with v0.2.5](https://github.com/jharemza/workday-scraper-api/compare/v0.2.5...v0.2.6)</small>
