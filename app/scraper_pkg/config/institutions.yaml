@@ -181,3 +181,7 @@ institutions:
   - name: "Allstate"
     workday_url: "https://allstate.wd5.myworkdayjobs.com/wday/cxs/allstate/allstate_careers/jobs"
     search_text: "sql"
+
+  - name: "Raymond James"
+    workday_url: "https://raymondjames.wd1.myworkdayjobs.com/wday/cxs/raymondjames/RaymondJamesCareers/jobs"
+    search_text: "sql"
