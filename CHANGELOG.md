@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.4.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.4.0) - 2025-11-18
+
+<small>[Compare with v0.3.0](https://github.com/jharemza/workday-scraper-api/compare/v0.3.0...v0.4.0)</small>
+
+### Features
+
+- add Raymond James to institutions and update metadata extraction ([5bf08f5](https://github.com/jharemza/workday-scraper-api/commit/5bf08f54097f3c7a4a83067f3d9dd9f0d16e96c3) by Jeremiah Haremza).
+
 ## [v0.3.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.3.0) - 2025-11-18
 
 <small>[Compare with v0.2.6](https://github.com/jharemza/workday-scraper-api/compare/v0.2.6...v0.3.0)</small>
