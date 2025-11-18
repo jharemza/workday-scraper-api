@@ -196,6 +196,8 @@ def collect_listing_metadata(cfg):
 
         if company_name == "First Rand" and len(bullet_fields) > 2:
             return bullet_fields[2] or (bullet_fields[0] if bullet_fields else None)
+        elif company_name == "Raymond James" and len(bullet_fields) > 1:
+            return bullet_fields[1] or (bullet_fields[0] if bullet_fields else None)
 
         return bullet_fields[0] if bullet_fields else None
 
