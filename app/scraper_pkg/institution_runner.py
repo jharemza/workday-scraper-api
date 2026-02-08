@@ -79,8 +79,11 @@ def extract_salary_range(description):
 
         normalized = value.replace("\xa0", "").replace(" ", "")
 
-        if "," in normalized and "." not in normalized:
-            normalized = normalized.replace(",", ".")
+        decimal_match = re.match(r"^(.*),(\d{2})$", normalized)
+        if decimal_match:
+            whole, cents = decimal_match.groups()
+            whole = whole.replace(".", "")
+            normalized = f"{whole}.{cents}"
         else:
             normalized = normalized.replace(",", "")
 
