@@ -62,10 +62,11 @@ def find_id_by_descriptor(facets, target_descriptor):
 def extract_salary_range(description):
     """Extract salary range (low, high) as floats from jobDescription HTML text."""
 
-    # Match values that may contain spaces, commas, or decimals and account for
-    # optional whitespace around the currency symbol and hyphen variations.
+    # Allow optional currency prefixes like "USD" before each dollar sign and
+    # accept commas, spaces, or decimals between thousand separators.
+    currency_prefix = r"(?:(?:[A-Za-z]{2,4})\s*)?"
     match = re.search(
-        r"\$\s*([\d][\d,\s]*(?:\.\d+)?)\s*[-–—]\s*\$?\s*([\d][\d,\s]*(?:\.\d+)?)",
+        rf"{currency_prefix}\$\s*([\d][\d,\s]*(?:[.,]\d+)?)\s*[-–—]\s*{currency_prefix}\$?\s*([\d][\d,\s]*(?:[.,]\d+)?)",
         description,
     )
     if not match:
@@ -73,9 +74,16 @@ def extract_salary_range(description):
         return None, None
 
     def _clean_numeric(value: str) -> str:
-        """Strip non-numeric characters (except decimal point) from salary text."""
+        """Normalize salary text to digits plus an optional decimal point."""
 
-        return re.sub(r"[^\d.]", "", value)
+        normalized = value.replace("\xa0", "").replace(" ", "")
+
+        if "," in normalized and "." not in normalized:
+            normalized = normalized.replace(",", ".")
+        else:
+            normalized = normalized.replace(",", "")
+
+        return re.sub(r"[^\d.]", "", normalized)
 
     low_str = _clean_numeric(match.group(1))
     high_str = _clean_numeric(match.group(2))
