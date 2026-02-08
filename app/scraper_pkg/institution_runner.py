@@ -65,10 +65,11 @@ def extract_salary_range(description):
     # Allow optional currency prefixes like "USD" before each dollar sign and
     # accept commas, spaces, or decimals between thousand separators.
     currency_prefix = r"(?:(?:[A-Za-z]{2,4})\s*)?"
-    match = re.search(
-        rf"{currency_prefix}\$\s*([\d][\d,\s]*(?:[.,]\d+)?)\s*[-–—]\s*{currency_prefix}\$?\s*([\d][\d,\s]*(?:[.,]\d+)?)",
-        description,
+    pattern = (
+        rf"{currency_prefix}\$\s*([\d][\d,\s]*(?:[.,]\d+)?)\s*[-–—]\s*"
+        rf"{currency_prefix}\$?\s*([\d][\d,\s]*(?:[.,]\d+)?)"
     )
+    match = re.search(pattern, description)
     if not match:
         logging.debug("Salary pattern not found in job description.")
         return None, None
