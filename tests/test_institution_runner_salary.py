@@ -2,9 +2,7 @@ import app.scraper_pkg.institution_runner as runner
 
 
 def test_salary_with_currency_prefix():
-    low, high = runner.extract_salary_range(
-        "Salary: USD$132,500.00 - USD$162,000.00"
-    )
+    low, high = runner.extract_salary_range("Salary: USD$132,500.00 - USD$162,000.00")
 
     assert low == 132500.0
     assert high == 162000.0
