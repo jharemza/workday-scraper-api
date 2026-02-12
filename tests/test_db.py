@@ -10,7 +10,7 @@ def temp_db(monkeypatch, tmp_path):
     return db_file
 
 
-def test_insert_retrieve_delete(temp_db):
+def test_insert_retrieve_delete(temp_db, monkeypatch):
     sample = {
         "company": "TestCo",
         "workday_id": "WD123",
@@ -44,6 +44,18 @@ def test_insert_retrieve_delete(temp_db):
     by_company = db.get_jobs_by_company("TestCo")
     assert len(by_company) == 1
 
+    inserted_date = all_jobs[0]["date_scraped"].split(" ")[0]
+
+    class _IsoDate:
+        def isoformat(self):
+            return inserted_date
+
+    class _FixedDate:
+        @staticmethod
+        def today():
+            return _IsoDate()
+
+    monkeypatch.setattr(db, "date", _FixedDate)
     today_jobs = db.get_jobs_today()
     assert len(today_jobs) == 1
 
