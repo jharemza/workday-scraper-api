@@ -1,0 +1,16 @@
+.git
+.github
+.pytest_cache
+.coverage
+coverage.xml
+__pycache__/
+*.py[cod]
+*.db
+*.log
+.env
+.venv/
+venv/
+logs/
+tests/
+docs/
+CHANGELOG.md
