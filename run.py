@@ -42,7 +42,7 @@ def serve(host, port):
     Launch the Flask API.
     """
     app = create_app()
-    app.run(host=host, port=port, debug=True)
+    app.run(host=host, port=port, debug=config.APP_DEBUG)
 
 
 if __name__ == "__main__":

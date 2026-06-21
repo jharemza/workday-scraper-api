@@ -31,4 +31,4 @@ USER appuser
 EXPOSE 5000
 
 # Start the Flask API server on the container port.
-CMD ["python", "run.py", "serve", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["python", "run.py", "serve"]

@@ -256,7 +256,7 @@ def collect_listing_metadata(cfg):
 
         offset += limit
         page_pbar.update(1)
-        time.sleep(0.1)
+        time.sleep(config.SCRAPER_LISTING_DELAY_SECONDS)
 
     sm_count = len(scraped_map)
     msg = f"Total job URLs collected: {sm_count}"
@@ -291,7 +291,9 @@ def fetch_job_details(urls):
         desc="Fetching job data",
     ):
         try:
-            response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            response = requests.get(
+                url, headers={"User-Agent": config.SCRAPER_USER_AGENT}
+            )
             response.raise_for_status()
             job_data = response.json().get("jobPostingInfo")
             if not job_data:
@@ -331,6 +333,6 @@ def fetch_job_details(urls):
             log_with_prefix("error", "GLOBAL", f"Fetch job detail failed ({url}): {e}")
             continue
 
-        time.sleep(0.5)
+        time.sleep(config.SCRAPER_DETAIL_DELAY_SECONDS)
 
     return job_postings
