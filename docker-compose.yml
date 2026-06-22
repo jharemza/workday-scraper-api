@@ -6,5 +6,7 @@ services:
       - "5000:5000"
     env_file:
       - .env
+    environment:
+      JOBS_DB_PATH: /app/jobs.db
     volumes:
-      - ./jobs.db:/app/jobs.db
+      - ${JOBS_DB_PATH:-./jobs.db}:/app/jobs.db
