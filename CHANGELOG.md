@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.5.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.5.0) - 2026-06-21
+
+<small>[Compare with v0.4.0](https://github.com/jharemza/workday-scraper-api/compare/v0.4.0...v0.5.0)</small>
+
+### Features
+
+- add Dockerfile and docker-compose.yml for containerized deployment ([31f5c64](https://github.com/jharemza/workday-scraper-api/commit/31f5c645faea0f4a8d29cf985504d3813e5ddd4b) by Jeremiah Haremza).
+- enhance test_insert_retrieve_delete to mock date handling with monkeypatch ([e0f384e](https://github.com/jharemza/workday-scraper-api/commit/e0f384eb02dfe17a8e7eca4c3f70cad7637d9a3c) by Jeremiah Haremza).
+- update coverage report and add tests for salary range extraction ([296b906](https://github.com/jharemza/workday-scraper-api/commit/296b906dd48357462d41ae44d87effa1d8d6de01) by Jeremiah Haremza).
+- enhance salary range normalization to support decimal formats ([9e8840a](https://github.com/jharemza/workday-scraper-api/commit/9e8840a0df02f9249d4858ac5426f15fded4beac) by Jeremiah Haremza).
+- enhance salary range extraction with currency prefix support and normalization ([bc892cd](https://github.com/jharemza/workday-scraper-api/commit/bc892cd15d927a9dece02612aab08c9a7c0dff80) by Jeremiah Haremza).
+
+### Bug Fixes
+
+- correct regex pattern definition for salary range extraction to comply with flake8 line length rule of 88 carachters. ([7c53ef2](https://github.com/jharemza/workday-scraper-api/commit/7c53ef2693ceed3747340128fd6c0cebdde01e95) by Jeremiah Haremza).
+
+### Chore
+
+- ignore backups directory ([ac558d3](https://github.com/jharemza/workday-scraper-api/commit/ac558d32c69dd23ef591caa6d0fbcd360efce570) by Jeremiah Haremza).
+
+### Code Refactoring
+
+- align docker compose database path with env config ([97fbb1b](https://github.com/jharemza/workday-scraper-api/commit/97fbb1be53bc05e19b77b92af999347c4d868cf6) by Jeremiah Haremza).
+- move runtime scraper settings into environment config ([5320360](https://github.com/jharemza/workday-scraper-api/commit/5320360f38dbda8944c1d85a9e39e178eb74ff92) by Jeremiah Haremza).
+- simplify test_salary_with_currency_prefix formatting for compliancy with black ([04d4f69](https://github.com/jharemza/workday-scraper-api/commit/04d4f69ed7bb12f9d48267546dcebea0c414deba) by Jeremiah Haremza).
+
 ## [v0.4.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.4.0) - 2025-11-18
 
 <small>[Compare with v0.3.0](https://github.com/jharemza/workday-scraper-api/compare/v0.3.0...v0.4.0)</small>
