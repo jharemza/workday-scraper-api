@@ -45,7 +45,7 @@ The OpenAPI Swagger UI for this API is available at:
 
 - **Core**: Python 3.12, Flask
 - **Scraper**: Vendored Workday-scraper logic under `app/scraper_pkg`
-- **Storage**: SQLite (`jobs.db`)
+- **Storage**: SQLite via `JOBS_DB_PATH`
 - **CLI**: `run.py` powered by Click—supports `scrape` & `serve` commands
 - **API**: Blueprint `jobs_bp` exposes `/jobs/...` routes
 - **Config**: `python-dotenv` + `app/config.py` environment-driven
@@ -74,14 +74,23 @@ pip install -r requirements.txt
 
 ### Configuration
 
-Create a `.env` file in the project root to override defaults (see `app/config.py`):
+Configuration defaults live in `app/config.py`. For local development or deployment-specific overrides, copy `.env.example` to a project-root `.env` file and adjust the values there. The application loads `.env` via `python-dotenv`, while `.env` itself remains gitignored.
+
+`JOBS_DB_PATH` is the environment variable that controls which SQLite database file the scraper/API uses at runtime.
+
+```bash
+cp .env.example .env
+```
+
+Example override:
 
 ```dotenv
-# Path to SQLite DB
+# Path to the SQLite database file used at runtime
 JOBS_DB_PATH=./jobs.db
 
 # Scrape settings
 SCRAPE_LIMIT=20
+FACET_LIMIT=1
 
 # API server settings
 API_HOST=127.0.0.1
@@ -91,16 +100,19 @@ API_PORT=5000
 LOG_LEVEL=INFO
 ```
 
+See `.env.example` for the full list of supported environment variables and public-safe sample values.
+
 ### Initialize the Database
 
-On first run the table is auto-created. To reset or customize:
+On first run the table is auto-created at the path configured by `JOBS_DB_PATH`. To reset or customize the schema against your configured database path:
 
 ```bash
-sqlite3 jobs.db << 'EOF'
+sqlite3 "$JOBS_DB_PATH" << 'EOF'
 DROP TABLE IF EXISTS job_postings;
 # paste the CREATE TABLE DDL from app/db.py here
 EOF
 ```
+`JOBS_DB_PATH` should be exported in your shell or loaded from your project-root `.env` before running the command.
 
 ## Usage
 
@@ -154,8 +166,8 @@ python run.py serve
 ├── logs/
 │   └── app.log        # auto-rotated logs
 ├── tests/             # pytest suite
-├── .env               # environment overrides (gitignored)
-├── jobs.db            # SQLite DB (auto-generated)
+├── .env.example       # public-safe environment template
+├── .env               # local environment overrides (gitignored)
 ├── README.md
 ├── requirements.txt
 └── run.py             # CLI commands (scrape & serve)
