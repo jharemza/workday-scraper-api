@@ -27,6 +27,7 @@ The OpenAPI Swagger UI for this API is available at:
 - [Logging](#logging)
 - [Testing](#testing)
 - [CI/CD](#cicd)
+- [Release Versioning](#release-versioning)
 - [License](#license)
 - [Example Requests](#example-requests)
   - [Using Curl](#using-curl)
@@ -39,7 +40,7 @@ The OpenAPI Swagger UI for this API is available at:
 - Expose a RESTful Flask API to query and trigger scrapes
 - Configurable via environment variables and `.env`
 - Structured logging to console and rotating log files
-- Automated changelog and daily ingestion via GitHub Actions
+- Automated changelog releases via GitHub Actions
 
 ## Architecture
 
@@ -153,7 +154,7 @@ python run.py serve
 ```bash
 .
 ├── .github/
-│   └── workflows/     # CI/CD (release & daily ingest)
+│   └── workflows/     # CI/CD (CI and release automation)
 ├── app/
 │   ├── main.py        # Flask app & logging setup
 │   ├── routes.py      # API endpoints
@@ -187,8 +188,8 @@ pytest --cov=app --cov-report=xml tests/
 
 ## CI/CD
 
+- `.github/workflows/ci.yml`: Run test and quality checks for the project.
 - `.github/workflows/release.yml`: Build releases from pushed `vMAJOR.MINOR.PATCH` tags.
-- `.github/workflows/ingest.yml`: Daily or manual scrape & optional DB commit
 
 ## Release Versioning
 
@@ -196,17 +197,27 @@ Git tags are the authoritative version source for releases. Keep the project met
 version in `pyproject.toml` semver-aligned with the current release, but do not use it
 to create or infer release tags.
 
+The `Release Changelog` workflow runs when a `vMAJOR.MINOR.PATCH` tag is pushed,
+or when an operator starts the workflow manually with an existing semantic version
+tag. The workflow validates that tag, generates or reuses the matching
+`CHANGELOG.md` section, commits a newly generated changelog update back to `main`,
+and creates the GitHub Release if one does not already exist.
+
 To cut a release:
 
-1. Create and push a semantic version tag, for example `v0.6.0`.
-2. The release workflow generates or reuses the matching `CHANGELOG.md` section.
-3. The workflow publishes a GitHub Release with the same tag.
+1. Confirm `main` contains the intended changes and CI is green.
+2. Create and push a semantic version tag, for example `v0.6.0`.
+3. Wait for the release workflow to generate or reuse the matching `CHANGELOG.md`
+   section.
+4. Confirm the workflow published a GitHub Release with the same tag.
 
-If `CHANGELOG.md` gets ahead of tags or a release job needs to be retried, first ensure
-the intended tag exists on GitHub, then run the release workflow manually with that tag
-(e.g., `v0.6.0`). The workflow reuses an existing changelog section for that tag instead
-of inventing a new version, which keeps changelog entries, Git tags, and GitHub releases
-aligned.
+If release state is partial or inconsistent, first identify the intended tag and make
+sure that tag exists on GitHub. Then rerun the release workflow manually with that
+tag. The workflow reuses an existing changelog section for that tag instead of
+inventing a new version, skips GitHub Release creation when the release already
+exists, and can fill in whichever artifact is missing. See the operator-facing
+[Release Playbook](docs/release-playbook.md) for normal flow details, expected
+artifacts, and step-by-step recovery procedures.
 
 ## License
 
