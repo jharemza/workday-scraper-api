@@ -187,8 +187,26 @@ pytest --cov=app --cov-report=xml tests/
 
 ## CI/CD
 
-- `.github/workflows/release.yml`: Auto-update `CHANGELOG.md` on tags/schedule
+- `.github/workflows/release.yml`: Build releases from pushed `vMAJOR.MINOR.PATCH` tags.
 - `.github/workflows/ingest.yml`: Daily or manual scrape & optional DB commit
+
+## Release Versioning
+
+Git tags are the authoritative version source for releases. Project metadata exposes the
+application version dynamically from `app.__version__` for packaging compatibility, but
+it does not drive release numbering.
+
+To cut a release:
+
+1. Create and push a semantic version tag, for example `v0.6.0`.
+2. The release workflow generates or reuses the matching `CHANGELOG.md` section.
+3. The workflow publishes a GitHub Release with the same tag.
+
+If `CHANGELOG.md` gets ahead of tags or a release job needs to be retried, first ensure
+the intended tag exists on GitHub, then run the release workflow manually with that tag
+(e.g., `v0.6.0`). The workflow reuses an existing changelog section for that tag instead
+of inventing a new version, which keeps changelog entries, Git tags, and GitHub releases
+aligned.
 
 ## License
 
