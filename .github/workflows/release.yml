@@ -1,34 +1,56 @@
 name: Release Changelog
 
-# Trigger on any pushed tag matching vMAJOR.MINOR.PATCH (e.g. v1.2.3)
-# and also once per week (Sunday at midnight UTC)
+# Tags are the authoritative release version source. Push vMAJOR.MINOR.PATCH
+# tags to generate the matching changelog entry and GitHub release.
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * 0"
+    inputs:
+      version:
+        description: "Existing semantic version tag to release (for recovery, e.g. v0.5.0)"
+        required: false
+        type: string
 
 permissions:
-  contents: write # allow the workflow to push commits back
+  contents: write
 
 jobs:
   update-changelog:
-    name: Generate & Commit CHANGELOG
+    name: Generate CHANGELOG and Release
     runs-on: ubuntu-latest
     steps:
-      # 1. Fetch full git history so git-changelog can see all commits
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
-      # 2. Checkout main branch
-      - name: Checkout Main
-        run: git checkout main
+      - name: Resolve release tag
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ inputs.version }}" ]]; then
+            TAG="${{ inputs.version }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
 
-      # 3. Install your tools
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ ERROR: Release tag '$TAG' must match vMAJOR.MINOR.PATCH."
+            exit 1
+          fi
+
+          VERSION="${TAG#v}"
+          if ! git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "❌ ERROR: Tag '$TAG' does not exist on origin. Create the tag before releasing."
+            exit 1
+          fi
+
+          git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -37,82 +59,47 @@ jobs:
       - name: Install git-changelog
         run: pip install git-changelog
 
-      # 4. Generate or update CHANGELOG.md in-place, using pyproject.toml config
-      - name: Generate and commit changelog
+      - name: Generate changelog for release tag
         id: changelog
         run: |
-          if ! git-changelog; then
-            echo "⚠️ git-changelog failed. Possibly due to duplicate version."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
+          TAG="${{ steps.version.outputs.tag }}"
+
+          if grep -Eq "^## \[$TAG\]" CHANGELOG.md; then
+            echo "CHANGELOG.md already contains $TAG; reusing existing release notes."
+          else
+            git-changelog
           fi
 
-          # Extract the latest version block
-          awk '
-            /^## \[v?[0-9]+\.[0-9]+\.[0-9]+\]/ { if (++i == 2) exit } i == 1 { print }
+          awk -v tag="$TAG" '
+            $0 ~ "^## \\[" tag "\\]" {found=1; print; next}
+            found && /^## \[v?[0-9]+\.[0-9]+\.[0-9]+\]/ {exit}
+            found {print}
           ' CHANGELOG.md > LATEST_CHANGELOG.md
 
-          # Check if it contains any section headers (###) or bullet points (-)
-          if ! grep -Eq '^(### |- )' LATEST_CHANGELOG.md; then
-            echo "⚠️ Changelog update skipped: latest version section is empty."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Debug: skip=true written to $GITHUB_OUTPUT"
-            exit 0
+          if [[ ! -s LATEST_CHANGELOG.md ]]; then
+            echo "❌ ERROR: Could not find a CHANGELOG.md section for $TAG."
+            exit 1
           fi
 
-          # Only commit if CHANGELOG.md was modified
           if [[ -n "$(git status --porcelain CHANGELOG.md)" ]]; then
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add CHANGELOG.md
-          git commit -m "docs: bump changelog"
-          git push origin HEAD
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add CHANGELOG.md
+            git commit -m "docs: update changelog for $TAG"
+            git push origin HEAD:main
           else
             echo "No changes to CHANGELOG.md, skipping commit."
           fi
 
-          # Extract version from CHANGELOG.md
-          VERSION=$(grep -oP '^## \[\Kv[0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md | head -n 1 | sed 's/^v//')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      # 5. Tag version if valid & new version in CHANGELOG.md
-      - name: Tag version
-        id: tag
-        if: steps.changelog.outputs.skip != 'true'
-        run: |
-          VERSION=${{ steps.changelog.outputs.version }}
-
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "❌ ERROR: Extracted version '$VERSION' is not a valid semantic version."
-          exit 1
-          fi
-
-          if git rev-parse "v$VERSION" >/dev/null 2>&1 || git ls-remote --tags origin | grep -q "refs/tags/v$VERSION"; then
-          echo "❌ ERROR: Tag v$VERSION already exists. Aborting to prevent overwrite."
-          exit 1
-          else
-          git tag "v$VERSION"
-          git push origin "v$VERSION"
-          fi
-
-      # 6. Create a release based on newly generated tag
-      - name: Extract latest changelog section
-        id: release
-        if: steps.changelog.outputs.skip != 'true'
-        run: |
-          awk '/^## \[v?[0-9]+\.[0-9]+\.[0-9]+/{i++} i==1' CHANGELOG.md > LATEST_CHANGELOG.md
-
       - name: Create GitHub Release
-        if: steps.changelog.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=${{ steps.changelog.outputs.version }}
-          if gh release view "v$VERSION" >/dev/null 2>&1; then
-            echo "⚠️ Release v$VERSION already exists. Skipping."
+          TAG="${{ steps.version.outputs.tag }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "⚠️ Release $TAG already exists. Skipping."
           else
-            gh release create "v$VERSION" \
-              --title "Release v$VERSION" \
+            gh release create "$TAG" \
+              --title "Release $TAG" \
               --notes-file LATEST_CHANGELOG.md
           fi
