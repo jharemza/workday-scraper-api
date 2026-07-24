@@ -188,6 +188,7 @@ pytest --cov=app --cov-report=xml tests/
 
 ## CI/CD
 
+- `.github/workflows/ci.yml`: Run test and quality checks for the project.
 - `.github/workflows/release.yml`: Build releases from pushed `vMAJOR.MINOR.PATCH` tags.
 
 ## Release Versioning

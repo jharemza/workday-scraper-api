@@ -51,9 +51,20 @@ Use the manual `workflow_dispatch` path for recovery. Always identify the intend
 
 ### Tag exists, GitHub Release exists, changelog section is missing
 
-1. Run the release workflow manually with the existing tag.
-2. The workflow will run `git-changelog`, commit the missing changelog entry to `main`, and skip release creation because the GitHub Release already exists.
-3. If the generated notes differ from the existing release notes, update the GitHub Release notes manually to match the committed changelog section.
+Do not rely on a manual rerun to regenerate an older missing changelog section after
+`main` has advanced. The release workflow checks out `main` and runs `git-changelog`
+from the current branch state when the requested section is absent, so it is only a
+safe automatic recovery path when `main` still represents the intended release state.
+
+1. Compare the release tag commit with current `main` and decide whether `main` still
+   matches the release state that should be documented.
+2. If `main` still matches that state, run the release workflow manually with the
+   existing tag and verify the generated section before treating recovery as complete.
+3. If `main` has advanced, manually reconstruct the missing `CHANGELOG.md` section
+   from the tag's commits or create a corrective patch release instead of depending on
+   the workflow to generate historical notes.
+4. If the existing GitHub Release notes differ from the corrected changelog section,
+   update the GitHub Release notes manually to match.
 
 ### Changelog section exists, tag is missing
 
