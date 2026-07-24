@@ -5,7 +5,7 @@ name: Release Changelog
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v*.*.*"
   workflow_dispatch:
     inputs:
       version:
@@ -67,7 +67,7 @@ jobs:
           if grep -Eq "^## \[$TAG\]" CHANGELOG.md; then
             echo "CHANGELOG.md already contains $TAG; reusing existing release notes."
           else
-            git-changelog "$TAG"
+            git-changelog
           fi
 
           awk -v tag="$TAG" '

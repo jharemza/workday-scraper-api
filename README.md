@@ -192,9 +192,9 @@ pytest --cov=app --cov-report=xml tests/
 
 ## Release Versioning
 
-Git tags are the authoritative version source for releases. Project metadata exposes the
-application version dynamically from `app.__version__` for packaging compatibility, but
-it does not drive release numbering.
+Git tags are the authoritative version source for releases. Keep the project metadata
+version in `pyproject.toml` semver-aligned with the current release, but do not use it
+to create or infer release tags.
 
 To cut a release:
 
