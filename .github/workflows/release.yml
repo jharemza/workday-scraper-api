@@ -1,7 +1,8 @@
 name: Release Changelog
 
 # Tags are the authoritative release version source. Push vMAJOR.MINOR.PATCH
-# tags to generate the matching changelog entry and GitHub release.
+# tags to generate the matching changelog entry and GitHub release. Manual
+# dispatch accepts an existing tag for retry/recovery; it does not mint tags.
 on:
   push:
     tags:
