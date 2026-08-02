@@ -10,6 +10,9 @@ __pycache__/
 .env
 EOF
 
+#Codex
+.codex/
+
 # Log file output
 logs/*.log
 
