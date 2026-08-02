@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.5.1](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.5.1) - 2026-08-02
+
+<small>[Compare with v0.5.0](https://github.com/jharemza/workday-scraper-api/compare/v0.5.0...v0.5.1)</small>
+
+### Bug Fixes
+
+- harden release workflow execution ([c0b8d84](https://github.com/jharemza/workday-scraper-api/commit/c0b8d84ac11bc6c5211a1029628c6f5bc9a27bc1) by jharemza). Related issues/PRs: [#52](https://github.com/jharemza/workday-scraper-api/issues/52)
+- align release version sources ([ae0cfab](https://github.com/jharemza/workday-scraper-api/commit/ae0cfab068c1716f23ff31596e0254fa83fba0b8) by jharemza). Related issues/PRs: [#50](https://github.com/jharemza/workday-scraper-api/issues/50)
+
+### Chore
+
+- bump project version to 0.5.1 ([027e7d8](https://github.com/jharemza/workday-scraper-api/commit/027e7d8edc03d2d0a0d0cd72555c65d33da0e79a) by Jeremiah Haremza).
+
+### Docs
+
+- add release operations playbook ([cc068fa](https://github.com/jharemza/workday-scraper-api/commit/cc068fa158a5e9890c11b715760d4b7a3d090fc9) by jharemza).
+
 ## [v0.5.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.5.0) - 2026-06-21
 
 <small>[Compare with v0.4.0](https://github.com/jharemza/workday-scraper-api/compare/v0.4.0...v0.5.0)</small>
