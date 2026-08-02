@@ -1,5 +1,10 @@
 name: Release Changelog
 
+env:
+  # Keep changelog output reproducible across release runs. Update this pin in a
+  # dedicated dependency change after reviewing the generated output.
+  GIT_CHANGELOG_VERSION: "2.6.3"
+
 # Tags are the authoritative release version source. Push vMAJOR.MINOR.PATCH
 # tags to generate the matching changelog entry and GitHub release. Manual
 # dispatch accepts an existing tag for retry/recovery; it does not mint tags.
@@ -11,8 +16,14 @@ on:
     inputs:
       version:
         description: "Existing semantic version tag to release (for recovery, e.g. v0.5.0)"
-        required: false
+        required: true
         type: string
+
+# Changelog commits all update main, so overlapping releases would race when
+# pushing. Queue them instead of cancelling a partially completed release.
+concurrency:
+  group: release-changelog
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -30,9 +41,14 @@ jobs:
 
       - name: Resolve release tag
         id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ inputs.version }}" ]]; then
-            TAG="${{ inputs.version }}"
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && -n "$INPUT_VERSION" ]]; then
+            TAG="$INPUT_VERSION"
           else
             TAG="${GITHUB_REF_NAME}"
           fi
@@ -51,24 +67,34 @@ jobs:
           git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved release version: $VERSION (tag: $TAG)"
+          echo "Tag commit: $(git rev-list -n 1 "$TAG")"
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
+          python-version: "3.12"
 
       - name: Install git-changelog
-        run: pip install git-changelog
+        run: |
+          set -euo pipefail
+          echo "Installing pinned git-changelog version $GIT_CHANGELOG_VERSION"
+          python -m pip install --disable-pip-version-check "git-changelog==$GIT_CHANGELOG_VERSION"
+          git-changelog --version
 
       - name: Generate changelog for release tag
         id: changelog
         run: |
+          set -euo pipefail
           TAG="${{ steps.version.outputs.tag }}"
 
           if grep -Eq "^## \[$TAG\]" CHANGELOG.md; then
             echo "CHANGELOG.md already contains $TAG; reusing existing release notes."
+            echo "action=reused" >> "$GITHUB_OUTPUT"
           else
+            echo "Generating CHANGELOG.md section for $TAG."
             git-changelog
+            echo "action=generated" >> "$GITHUB_OUTPUT"
           fi
 
           awk -v tag="$TAG" '
@@ -81,6 +107,7 @@ jobs:
             echo "❌ ERROR: Could not find a CHANGELOG.md section for $TAG."
             exit 1
           fi
+          echo "Prepared LATEST_CHANGELOG.md ($(wc -c < LATEST_CHANGELOG.md) bytes)."
 
           if [[ -n "$(git status --porcelain CHANGELOG.md)" ]]; then
             git config user.name "github-actions[bot]"
@@ -89,18 +116,40 @@ jobs:
             git commit -m "docs: update changelog for $TAG"
             git push origin HEAD:main
           else
-            echo "No changes to CHANGELOG.md, skipping commit."
+            echo "Skip condition: CHANGELOG.md has no changes to commit."
           fi
 
       - name: Create GitHub Release
+        id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           TAG="${{ steps.version.outputs.tag }}"
           if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "⚠️ Release $TAG already exists. Skipping."
+            RELEASE_URL="$(gh release view "$TAG" --json url --jq .url)"
+            echo "Skip condition: GitHub Release $TAG already exists at $RELEASE_URL."
+            echo "action=reused" >> "$GITHUB_OUTPUT"
           else
+            echo "Creating GitHub Release $TAG from LATEST_CHANGELOG.md."
             gh release create "$TAG" \
+              --verify-tag \
               --title "Release $TAG" \
               --notes-file LATEST_CHANGELOG.md
+            RELEASE_URL="$(gh release view "$TAG" --json url --jq .url)"
+            echo "Created GitHub Release: $RELEASE_URL"
+            echo "action=created" >> "$GITHUB_OUTPUT"
           fi
+          echo "url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Summarize release
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Release ${{ steps.version.outputs.tag }}
+
+          - Version: ${{ steps.version.outputs.version }}
+          - Tag: ${{ steps.version.outputs.tag }}
+          - Changelog: ${{ steps.changelog.outputs.action }}
+          - GitHub Release: ${{ steps.release.outputs.action }}
+          - Release URL: ${{ steps.release.outputs.url }}
+          EOF
