@@ -1,5 +1,5 @@
 import app.scraper_pkg.institution_runner as runner
-from app.scraper_pkg.institution_runner import collect_listing_metadata
+from app.scraper_pkg.institution_runner import CollectionStatus, collect_listing_metadata
 from tests.test_scraper import DummyResponse
 
 
@@ -27,5 +27,6 @@ def test_unmatched_location_facets(monkeypatch):
         "locations": ["New York"],
     }
 
-    metadata = collect_listing_metadata(inst)
-    assert metadata == {}
+    result = collect_listing_metadata(inst)
+    assert result.status is CollectionStatus.UNMATCHED_LOCATION
+    assert result.metadata == {}

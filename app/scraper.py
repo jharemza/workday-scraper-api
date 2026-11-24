@@ -63,7 +63,16 @@ def run_scrape(companies=None):
         logger.info(f"Starting scrape for {company}")
 
         # 3a. Collect listing metadata only.
-        scraped_map = collect_listing_metadata(cfg)
+        collection = collect_listing_metadata(cfg)
+        if not collection.is_authoritative:
+            logger.error(
+                "Skipping %s: non-authoritative listing collection (%s): %s",
+                company,
+                collection.status.value,
+                collection.error or "no additional detail",
+            )
+            continue
+        scraped_map = collection.metadata
         scraped_ids = set(scraped_map.keys())
 
         # 3b. Diffing
