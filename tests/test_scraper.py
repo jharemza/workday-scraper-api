@@ -313,7 +313,9 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
 
     monkeypatch.setattr(
         "app.scraper.collect_listing_metadata",
-        lambda _cfg: CollectionResult(CollectionStatus.SUCCESSFUL_NONEMPTY, scraped_map),
+        lambda _cfg: CollectionResult(
+            CollectionStatus.SUCCESSFUL_NONEMPTY, scraped_map
+        ),
     )
     monkeypatch.setattr("app.scraper.get_existing_job_ids", lambda _company: {"REQ1"})
 

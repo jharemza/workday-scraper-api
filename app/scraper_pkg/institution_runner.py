@@ -159,7 +159,10 @@ def _post_json(url, payload, company_name, request_name):
         return None, CollectionStatus.PARSE_FAILURE, message
 
     if not isinstance(body, dict):
-        message = f"{request_name} JSON root must be an object, got {type(body).__name__}"
+        message = (
+            f"{request_name} JSON root must be an object, "
+            f"got {type(body).__name__}"
+        )
         log_with_prefix("error", company_name, message)
         return None, CollectionStatus.PARSE_FAILURE, message
 
@@ -256,7 +259,12 @@ def collect_listing_metadata(cfg):
         return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
     jobs_first_batch = data["jobPostings"]
     total = data["total"]
-    if not isinstance(jobs_first_batch, list) or isinstance(total, bool) or not isinstance(total, int) or total < 0:
+    if (
+        not isinstance(jobs_first_batch, list)
+        or isinstance(total, bool)
+        or not isinstance(total, int)
+        or total < 0
+    ):
         message = "Initial listing response has invalid 'jobPostings' or 'total' types"
         log_with_prefix("error", company_name, message)
         return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
@@ -301,7 +309,9 @@ def collect_listing_metadata(cfg):
             req_id = extract_req_id(job)
             ext_path = job.get("externalPath", "")
             if ext_path and not isinstance(ext_path, str):
-                raise ValueError("jobPosting externalPath must be a string when present")
+                raise ValueError(
+                    "jobPosting externalPath must be a string when present"
+                )
             if req_id and ext_path:
                 job_url = f"{url.rsplit('/jobs', 1)[0]}/job/{ext_path.split('/')[-1]}"
                 scraped_map[req_id] = job_url
@@ -325,8 +335,13 @@ def collect_listing_metadata(cfg):
             )
             if failure_status:
                 return CollectionResult(failure_status, error=error)
-            if "jobPostings" not in page_data or not isinstance(page_data["jobPostings"], list):
-                message = "Pagination response requires a list-valued 'jobPostings' field"
+            if "jobPostings" not in page_data or not isinstance(
+                page_data["jobPostings"], list
+            ):
+                message = (
+                    "Pagination response requires a list-valued "
+                    "'jobPostings' field"
+                )
                 log_with_prefix("error", company_name, message)
                 return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
             collect_batch(page_data["jobPostings"])

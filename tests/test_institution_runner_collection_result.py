@@ -33,7 +33,11 @@ def institution():
 
 def install_posts(monkeypatch, responses):
     responses = iter(responses)
-    monkeypatch.setattr(runner.requests, "post", lambda *_args, **_kwargs: next(responses))
+    monkeypatch.setattr(
+        runner.requests,
+        "post",
+        lambda *_args, **_kwargs: next(responses),
+    )
 
 
 @pytest.mark.parametrize("message", ["429 Too Many Requests", "500 Server Error"])
@@ -49,7 +53,11 @@ def test_facet_http_errors_are_not_authoritative(monkeypatch, message):
 
 def test_facet_connection_error_is_not_authoritative(monkeypatch):
     monkeypatch.setattr(
-        runner.requests, "post", lambda *_args, **_kwargs: (_ for _ in ()).throw(requests.ConnectionError("offline"))
+        runner.requests,
+        "post",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            requests.ConnectionError("offline")
+        ),
     )
 
     result = runner.collect_listing_metadata(institution())
@@ -71,9 +79,14 @@ def test_initial_listing_http_failure_cannot_reuse_facet_response(monkeypatch):
     assert result.metadata == {}
 
 
-@pytest.mark.parametrize("json_error", [ValueError("HTML response"), ValueError("empty body")])
+@pytest.mark.parametrize(
+    "json_error", [ValueError("HTML response"), ValueError("empty body")]
+)
 def test_invalid_listing_json_is_parse_failure(monkeypatch, json_error):
-    install_posts(monkeypatch, [Response({"facets": []}), Response(json_error=json_error)])
+    install_posts(
+        monkeypatch,
+        [Response({"facets": []}), Response(json_error=json_error)],
+    )
 
     result = runner.collect_listing_metadata(institution())
 
@@ -88,7 +101,9 @@ def test_invalid_listing_json_is_parse_failure(monkeypatch, json_error):
         [Response({"facets": []}), Response({"total": 0})],
     ],
 )
-def test_missing_required_facet_or_listing_fields_are_parse_failures(monkeypatch, responses):
+def test_missing_required_facet_or_listing_fields_are_parse_failures(
+    monkeypatch, responses
+):
     install_posts(monkeypatch, responses)
 
     result = runner.collect_listing_metadata(institution())
@@ -98,7 +113,10 @@ def test_missing_required_facet_or_listing_fields_are_parse_failures(monkeypatch
 
 
 def test_valid_empty_listing_is_authoritative(monkeypatch):
-    install_posts(monkeypatch, [Response({"facets": []}), Response({"jobPostings": [], "total": 0})])
+    install_posts(
+        monkeypatch,
+        [Response({"facets": []}), Response({"jobPostings": [], "total": 0})],
+    )
 
     result = runner.collect_listing_metadata(institution())
 
@@ -120,15 +138,29 @@ def test_run_scrape_skips_database_mutations_for_failed_collection(monkeypatch):
 
     logger = Logger()
     monkeypatch.setattr(scraper, "init_db", lambda: None)
-    monkeypatch.setattr(scraper, "load_institutions_config", lambda: [institution()])
+    monkeypatch.setattr(
+        scraper, "load_institutions_config", lambda: [institution()]
+    )
     monkeypatch.setattr(
         scraper,
         "collect_listing_metadata",
         lambda _cfg: CollectionResult(CollectionStatus.HTTP_FAILURE, error="429"),
     )
-    monkeypatch.setattr(scraper, "get_existing_job_ids", lambda *_args: pytest.fail("diff must not run"))
-    monkeypatch.setattr(scraper, "fetch_job_details", lambda *_args: pytest.fail("fetch must not run"))
-    monkeypatch.setattr(scraper, "delete_job_posting", lambda *_args: pytest.fail("delete must not run"))
+    monkeypatch.setattr(
+        scraper,
+        "get_existing_job_ids",
+        lambda *_args: pytest.fail("diff must not run"),
+    )
+    monkeypatch.setattr(
+        scraper,
+        "fetch_job_details",
+        lambda *_args: pytest.fail("fetch must not run"),
+    )
+    monkeypatch.setattr(
+        scraper,
+        "delete_job_posting",
+        lambda *_args: pytest.fail("delete must not run"),
+    )
     monkeypatch.setattr(scraper, "logger", logger)
 
     scraper.run_scrape(["Test"])

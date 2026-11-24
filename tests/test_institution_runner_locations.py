@@ -1,5 +1,8 @@
 import app.scraper_pkg.institution_runner as runner
-from app.scraper_pkg.institution_runner import CollectionStatus, collect_listing_metadata
+from app.scraper_pkg.institution_runner import (
+    CollectionStatus,
+    collect_listing_metadata,
+)
 from tests.test_scraper import DummyResponse
 
 
