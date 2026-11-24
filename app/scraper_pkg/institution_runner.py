@@ -160,8 +160,7 @@ def _post_json(url, payload, company_name, request_name):
 
     if not isinstance(body, dict):
         message = (
-            f"{request_name} JSON root must be an object, "
-            f"got {type(body).__name__}"
+            f"{request_name} JSON root must be an object, " f"got {type(body).__name__}"
         )
         log_with_prefix("error", company_name, message)
         return None, CollectionStatus.PARSE_FAILURE, message
@@ -339,8 +338,7 @@ def collect_listing_metadata(cfg):
                 page_data["jobPostings"], list
             ):
                 message = (
-                    "Pagination response requires a list-valued "
-                    "'jobPostings' field"
+                    "Pagination response requires a list-valued " "'jobPostings' field"
                 )
                 log_with_prefix("error", company_name, message)
                 return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)

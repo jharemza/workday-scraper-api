@@ -138,9 +138,7 @@ def test_run_scrape_skips_database_mutations_for_failed_collection(monkeypatch):
 
     logger = Logger()
     monkeypatch.setattr(scraper, "init_db", lambda: None)
-    monkeypatch.setattr(
-        scraper, "load_institutions_config", lambda: [institution()]
-    )
+    monkeypatch.setattr(scraper, "load_institutions_config", lambda: [institution()])
     monkeypatch.setattr(
         scraper,
         "collect_listing_metadata",
