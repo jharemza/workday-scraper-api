@@ -125,6 +125,148 @@ def test_valid_empty_listing_is_authoritative(monkeypatch):
     assert result.metadata == {}
 
 
+def test_non_object_json_root_is_parse_failure(monkeypatch):
+    install_posts(monkeypatch, [Response([])])
+
+    result = runner.collect_listing_metadata(institution())
+
+    assert result.status is CollectionStatus.PARSE_FAILURE
+    assert not result.is_authoritative
+
+
+def test_matched_location_is_collected_with_applied_facet(monkeypatch):
+    cfg = institution() | {"locations": ["New York"]}
+    install_posts(
+        monkeypatch,
+        [
+            Response(
+                {
+                    "facets": [
+                        {
+                            "facetParameter": "locations",
+                            "values": [{"descriptor": "New York", "id": "NY"}],
+                        }
+                    ]
+                }
+            ),
+            Response(
+                {
+                    "jobPostings": [
+                        {"bulletFields": ["REQ1"], "externalPath": "job/REQ1"}
+                    ],
+                    "total": 1,
+                }
+            ),
+        ],
+    )
+
+    result = runner.collect_listing_metadata(cfg)
+
+    assert result.status is CollectionStatus.SUCCESSFUL_NONEMPTY
+    assert result.metadata == {"REQ1": "https://example.test/job/REQ1"}
+
+
+@pytest.mark.parametrize(
+    "listing",
+    [
+        {"jobPostings": "not-a-list", "total": 1},
+        {"jobPostings": [], "total": True},
+        {"jobPostings": [], "total": -1},
+        {"jobPostings": [{"bulletFields": ["REQ1"]}], "total": 0},
+        {"jobPostings": [], "total": 1},
+    ],
+)
+def test_inconsistent_or_invalid_listing_metadata_is_parse_failure(
+    monkeypatch, listing
+):
+    install_posts(monkeypatch, [Response({"facets": []}), Response(listing)])
+
+    result = runner.collect_listing_metadata(institution())
+
+    assert result.status is CollectionStatus.PARSE_FAILURE
+    assert not result.is_authoritative
+
+
+@pytest.mark.parametrize(
+    "posting",
+    [
+        "not-an-object",
+        {"bulletFields": "REQ1", "externalPath": "job/REQ1"},
+        {"bulletFields": ["REQ1"], "externalPath": 42},
+    ],
+)
+def test_malformed_posting_fields_are_parse_failures(monkeypatch, posting):
+    install_posts(
+        monkeypatch,
+        [
+            Response({"facets": []}),
+            Response({"jobPostings": [posting], "total": 1}),
+        ],
+    )
+
+    result = runner.collect_listing_metadata(institution())
+
+    assert result.status is CollectionStatus.PARSE_FAILURE
+    assert not result.is_authoritative
+
+
+def test_positive_listing_without_requisition_metadata_is_parse_failure(monkeypatch):
+    install_posts(
+        monkeypatch,
+        [
+            Response({"facets": []}),
+            Response(
+                {
+                    "jobPostings": [
+                        {"bulletFields": [], "externalPath": "job/no-requisition"}
+                    ],
+                    "total": 1,
+                }
+            ),
+        ],
+    )
+
+    result = runner.collect_listing_metadata(institution())
+
+    assert result.status is CollectionStatus.PARSE_FAILURE
+    assert not result.is_authoritative
+
+
+@pytest.mark.parametrize(
+    "second_page",
+    [
+        Response(http_error=requests.HTTPError("500")),
+        Response({"total": 2}),
+    ],
+)
+def test_pagination_failure_is_non_authoritative(monkeypatch, second_page):
+    monkeypatch.setattr(runner.config, "SCRAPE_LIMIT", 1)
+    install_posts(
+        monkeypatch,
+        [
+            Response({"facets": []}),
+            Response(
+                {
+                    "jobPostings": [
+                        {"bulletFields": ["REQ1"], "externalPath": "job/REQ1"}
+                    ],
+                    "total": 2,
+                }
+            ),
+            second_page,
+        ],
+    )
+    monkeypatch.setattr(runner.time, "sleep", lambda *_args, **_kwargs: None)
+
+    result = runner.collect_listing_metadata(institution())
+
+    assert result.status in {
+        CollectionStatus.HTTP_FAILURE,
+        CollectionStatus.PARSE_FAILURE,
+    }
+    assert not result.is_authoritative
+
+
 def test_run_scrape_skips_database_mutations_for_failed_collection(monkeypatch):
     class Logger:
         def __init__(self):

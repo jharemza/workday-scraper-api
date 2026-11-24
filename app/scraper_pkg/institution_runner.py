@@ -302,8 +302,6 @@ def collect_listing_metadata(cfg):
         return bullet_fields[0] if bullet_fields else None
 
     def collect_batch(jobs):
-        if not isinstance(jobs, list):
-            raise ValueError("jobPostings must be a list")
         for job in jobs:
             req_id = extract_req_id(job)
             ext_path = job.get("externalPath", "")
