@@ -104,6 +104,49 @@ def test_partial_detail_fetch_keeps_original_rows(seeded_company, monkeypatch):
     assert req_hash() == before_hash
 
 
+@pytest.mark.parametrize(
+    "details",
+    [
+        [{**job("D"), "workday_id": None}],
+        [job("D"), job("D", workday_id="WD-D-duplicate")],
+    ],
+)
+def test_invalid_detail_identifiers_or_duplicates_keep_original_rows(
+    seeded_company, monkeypatch, details
+):
+    before_hash = req_hash()
+    configure_run(
+        monkeypatch,
+        CollectionResult(
+            CollectionStatus.SUCCESSFUL_NONEMPTY,
+            {"A": "https://example.test/job/A", "D": "https://example.test/job/D"},
+        ),
+        lambda _urls: details,
+    )
+
+    scraper.run_scrape([COMPANY])
+
+    assert req_ids() == {"A", "B", "C"}
+    assert req_hash() == before_hash
+
+
+def test_existing_only_listing_can_commit_deletions_without_detail_fetch(
+    seeded_company, monkeypatch
+):
+    configure_run(
+        monkeypatch,
+        CollectionResult(
+            CollectionStatus.SUCCESSFUL_NONEMPTY,
+            {"A": "https://example.test/job/A"},
+        ),
+        lambda _urls: pytest.fail("existing postings do not need a detail fetch"),
+    )
+
+    scraper.run_scrape([COMPANY])
+
+    assert req_ids() == {"A"}
+
+
 def test_duplicate_workday_id_rolls_back_all_company_mutations(
     seeded_company, monkeypatch
 ):
@@ -123,6 +166,11 @@ def test_duplicate_workday_id_rolls_back_all_company_mutations(
     assert req_hash() == before_hash
     with db._connect() as conn:
         assert not conn.in_transaction
+
+
+def test_delete_without_an_identifier_is_rejected(seeded_company):
+    with pytest.raises(ValueError, match="required"):
+        db.delete_job_posting(COMPANY)
 
 
 def test_mid_transaction_exception_rolls_back_inserts_and_deletes(
