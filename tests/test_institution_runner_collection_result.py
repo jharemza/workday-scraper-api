@@ -585,8 +585,8 @@ def test_run_scrape_skips_database_mutations_for_every_incomplete_collection(
     )
     monkeypatch.setattr(
         scraper,
-        "delete_job_posting",
-        lambda *_args: pytest.fail("delete must not run"),
+        "apply_company_diff",
+        lambda *_args: pytest.fail("transaction must not run"),
     )
     monkeypatch.setattr(scraper, "logger", logger)
 

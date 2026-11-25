@@ -326,12 +326,12 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
             jobs.append(make_job(req_id, workday_id=f"WD-{req_id}"))
         return jobs
 
-    def fake_insert(company, workday_id, **kwargs):
-        inserted_ids.append((company, workday_id))
+    def fake_apply(company, new_jobs, deleted_req_ids):
+        inserted_ids.extend((company, job["workday_id"]) for job in new_jobs)
+        return {"inserted": len(new_jobs), "deleted": len(deleted_req_ids)}
 
     monkeypatch.setattr("app.scraper.fetch_job_details", fake_fetch)
-    monkeypatch.setattr("app.scraper.insert_job_posting", fake_insert)
-    monkeypatch.setattr("app.scraper.delete_job_posting", lambda *a, **k: None)
+    monkeypatch.setattr("app.scraper.apply_company_diff", fake_apply)
     monkeypatch.setattr("app.scraper.logger", dummy_logger)
 
     run_scrape(["Test"])

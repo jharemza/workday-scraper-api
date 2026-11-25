@@ -16,8 +16,7 @@ This diff-based design minimizes redundant network requests.
 from app.db import (
     init_db,
     get_existing_job_ids,
-    insert_job_posting,
-    delete_job_posting,
+    apply_company_diff,
 )
 from app.scraper_pkg.config_loader import load_institutions_config
 from app.scraper_pkg.institution_runner import (
@@ -28,6 +27,26 @@ import logging
 
 
 logger = logging.getLogger(__name__)
+
+
+def _validate_fetched_details(expected_req_ids, jobs):
+    """Require exactly one valid detail record for every planned insertion."""
+
+    found_req_ids = set()
+    for job in jobs:
+        req_id = job.get("job_req_id")
+        workday_id = job.get("workday_id")
+        if not isinstance(req_id, str) or not req_id or not workday_id:
+            raise ValueError("detail fetch returned a job without required identifiers")
+        if req_id in found_req_ids:
+            raise ValueError(f"detail fetch returned duplicate requisition {req_id}")
+        found_req_ids.add(req_id)
+
+    if found_req_ids != expected_req_ids:
+        raise ValueError(
+            "detail fetch did not return exactly the planned requisitions "
+            f"(expected {sorted(expected_req_ids)}, got {sorted(found_req_ids)})"
+        )
 
 
 def run_scrape(companies=None):
@@ -82,26 +101,32 @@ def run_scrape(companies=None):
         deleted_ids = db_ids - scraped_ids
         skipped_count = len(scraped_ids) - len(inserted_ids)
 
-        # 3c. Fetch details only for jobs to be inserted.
-        # Fetch and insert details for new postings only
+        # 3c. Fetch and validate every detail before beginning any database work.
         if inserted_ids:
             inserted_urls = [scraped_map[i] for i in inserted_ids]
             new_jobs = fetch_job_details(inserted_urls)
-            for job in new_jobs:
-                insert_job_posting(company, **job)
+            try:
+                _validate_fetched_details(inserted_ids, new_jobs)
+            except ValueError as exc:
+                logger.error("Skipping %s: incomplete detail fetch: %s", company, exc)
+                continue
+        else:
+            new_jobs = []
 
-        # 3d. Delete stale postings
-        # Remove postings no longer listed in the source
-        for req_id in deleted_ids:
-            delete_job_posting(company, job_req_id=req_id)
+        # 3d. Apply the complete, validated mutation plan as one transaction.
+        try:
+            durable_delta = apply_company_diff(company, new_jobs, deleted_ids)
+        except Exception as exc:
+            logger.error("Skipping %s: transaction rolled back: %s", company, exc)
+            continue
 
         logger.info(f"Completed scrape for {company}")
 
         summary = (
             f"📊 {company} Summary:\n"
-            f"  ✅ Inserted: {len(inserted_ids)}\n"
+            f"  ✅ Inserted: {durable_delta['inserted']}\n"
             f"  🟡 Skipped : {skipped_count}\n"
-            f"  🔴 Deleted : {len(deleted_ids)}\n"
+            f"  🔴 Deleted : {durable_delta['deleted']}\n"
             f"  📦 Total   : {len(scraped_ids)}\n"
         )
         logger.info(summary)
