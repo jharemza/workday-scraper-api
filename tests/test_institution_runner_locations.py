@@ -9,7 +9,7 @@ from tests.test_scraper import DummyResponse
 def test_unmatched_location_facets(monkeypatch):
     """Return empty dict when location descriptors don't match facets."""
 
-    def mock_post(url, json=None, headers=None):
+    def mock_post(url, json=None, headers=None, timeout=None):
         payload = {
             "facets": [
                 {

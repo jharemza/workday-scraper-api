@@ -65,7 +65,7 @@ def test_collect_listing_metadata(monkeypatch):
         ),
     ]
 
-    def mock_post(url, json=None, headers=None):
+    def mock_post(url, json=None, headers=None, timeout=None):
         return posts.pop(0)
 
     monkeypatch.setattr(runner.requests, "post", mock_post)
@@ -110,7 +110,7 @@ def test_collect_listing_metadata_first_rand_fallback(monkeypatch):
         ),
     ]
 
-    def mock_post(url, json=None, headers=None):
+    def mock_post(url, json=None, headers=None, timeout=None):
         return posts.pop(0)
 
     monkeypatch.setattr(runner.requests, "post", mock_post)
@@ -149,7 +149,7 @@ def test_collect_listing_metadata_raymond_james(monkeypatch):
         ),
     ]
 
-    def mock_post(url, json=None, headers=None):
+    def mock_post(url, json=None, headers=None, timeout=None):
         return posts.pop(0)
 
     monkeypatch.setattr(runner.requests, "post", mock_post)

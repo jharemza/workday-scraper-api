@@ -1,0 +1,13 @@
+{
+  "jobPostings": [
+    {
+      "bulletFields": ["REQ-EXAMPLE-1"],
+      "externalPath": "job/REQ-EXAMPLE-1"
+    },
+    {
+      "bulletFields": ["REQ-EXAMPLE-2"],
+      "externalPath": "job/REQ-EXAMPLE-2"
+    }
+  ],
+  "total": 2
+}
