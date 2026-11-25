@@ -109,6 +109,7 @@ def test_partial_detail_fetch_keeps_original_rows(seeded_company, monkeypatch):
     [
         [{**job("D"), "workday_id": None}],
         [job("D"), job("D", workday_id="WD-D-duplicate")],
+        ["not-a-detail-record"],
     ],
 )
 def test_invalid_detail_identifiers_or_duplicates_keep_original_rows(
@@ -223,7 +224,7 @@ def test_complete_company_diff_commits_once_with_expected_deltas(
     assert req_ids() == {"A", "D"}
     assert len(req_ids()) == 2
     assert req_hash() != before_hash
-    assert "Inserted: 1" in caplog.text
-    assert "Deleted : 2" in caplog.text
+    assert "Actual inserted: 1" in caplog.text
+    assert "Actual deleted: 2" in caplog.text
     with db._connect() as conn:
         assert not conn.in_transaction
