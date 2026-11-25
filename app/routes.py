@@ -95,7 +95,7 @@ def trigger_scrape():
         data = request.get_json(force=True)
         companies = data.get("companies", [])
         results = run_scrape(companies)
-        return jsonify({"scraped": results}), 202
+        return jsonify(results), 200 if results["success"] else 503
     except Exception as e:
         current_app.logger.error(f"Error in /jobs/scrape: {e}")
         return jsonify({"error": "Scrape failed", "details": str(e)}), 500

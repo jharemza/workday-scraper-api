@@ -1,6 +1,7 @@
 # run.py
 
 import click
+import json
 from app.main import create_app
 from app.scraper import run_scrape
 from app.scraper_pkg.config_loader import load_institutions_config
@@ -29,7 +30,9 @@ def scrape(companies):
     else:
         targets = [inst["name"] for inst in load_institutions_config()]
     result = run_scrape(targets)
-    click.echo(result)
+    click.echo(json.dumps(result, sort_keys=True))
+    if not result["success"]:
+        raise click.exceptions.Exit(1)
 
 
 @cli.command()

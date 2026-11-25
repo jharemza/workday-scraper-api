@@ -105,10 +105,24 @@ def test_scrape_route(client, monkeypatch, tmp_path):
 
 
 def test_trigger_scrape(client, monkeypatch):
-    monkeypatch.setattr("app.routes.run_scrape", lambda comps: "ok")
+    expected = {"success": True, "institutions": []}
+    monkeypatch.setattr("app.routes.run_scrape", lambda comps: expected)
     res = client.post("/jobs/scrape", json={"companies": ["TestCo"]})
-    assert res.status_code == 202
-    assert res.get_json() == {"scraped": "ok"}
+    assert res.status_code == 200
+    assert res.get_json() == expected
+
+
+def test_trigger_scrape_reports_unsuccessful_result(client, monkeypatch):
+    expected = {
+        "success": False,
+        "institutions": [{"company": "TestCo", "status": "http_failure"}],
+    }
+    monkeypatch.setattr("app.routes.run_scrape", lambda comps: expected)
+
+    res = client.post("/jobs/scrape", json={"companies": ["TestCo"]})
+
+    assert res.status_code == 503
+    assert res.get_json() == expected
 
 
 def _raise(*_args, **_kwargs):

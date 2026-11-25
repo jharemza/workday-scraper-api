@@ -1,5 +1,6 @@
 import app.db as db
 import app.config as config
+import pytest
 from app.scraper import run_scrape
 from app.scraper_pkg.institution_runner import (
     CollectionResult,
@@ -273,13 +274,102 @@ def test_run_scrape_db_ops(monkeypatch, tmp_path):
     monkeypatch.setattr("app.scraper.collect_listing_metadata", fake_collect)
     monkeypatch.setattr("app.scraper.fetch_job_details", fake_fetch)
 
-    run_scrape([inst_cfg["name"]])
+    first_result = run_scrape([inst_cfg["name"]])
     rows = db.get_jobs_by_company("Test")
     assert {r["job_req_id"] for r in rows} == {"REQ1", "REQ2"}
+    assert first_result == {
+        "success": True,
+        "institutions": [
+            {
+                "company": "Test",
+                "metadata_ids_found": 2,
+                "detail_fetch_succeeded": 2,
+                "failed_detail": 0,
+                "actual_inserted": 2,
+                "actual_deleted": 0,
+                "actual_updated": 0,
+                "institution_complete": True,
+                "status": "complete",
+                "error": None,
+            }
+        ],
+    }
 
-    run_scrape([inst_cfg["name"]])
+    second_result = run_scrape([inst_cfg["name"]])
     rows = db.get_jobs_by_company("Test")
     assert {r["job_req_id"] for r in rows} == {"REQ2", "REQ3"}
+    assert second_result["institutions"][0] == {
+        "company": "Test",
+        "metadata_ids_found": 2,
+        "detail_fetch_succeeded": 1,
+        "failed_detail": 0,
+        "actual_inserted": 1,
+        "actual_deleted": 1,
+        "actual_updated": 0,
+        "institution_complete": True,
+        "status": "complete",
+        "error": None,
+    }
+
+
+def test_run_scrape_reports_collection_failure_as_unsuccessful(monkeypatch):
+    monkeypatch.setattr("app.scraper.init_db", lambda: None)
+    monkeypatch.setattr(
+        "app.scraper.load_institutions_config",
+        lambda: [
+            {
+                "name": "Test",
+                "workday_url": "https://example.test/jobs",
+                "search_text": "",
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        "app.scraper.collect_listing_metadata",
+        lambda _cfg: CollectionResult(CollectionStatus.HTTP_FAILURE, error="429"),
+    )
+    monkeypatch.setattr(
+        "app.scraper.get_existing_job_ids",
+        lambda *_args: pytest.fail("diff must not run"),
+    )
+
+    result = run_scrape(["Test"])
+
+    assert result == {
+        "success": False,
+        "institutions": [
+            {
+                "company": "Test",
+                "metadata_ids_found": 0,
+                "detail_fetch_succeeded": 0,
+                "failed_detail": 0,
+                "actual_inserted": 0,
+                "actual_deleted": 0,
+                "actual_updated": 0,
+                "institution_complete": False,
+                "status": "http_failure",
+                "error": "429",
+            }
+        ],
+    }
+
+
+def test_run_scrape_reports_collection_exception_as_unsuccessful(monkeypatch):
+    monkeypatch.setattr("app.scraper.init_db", lambda: None)
+    monkeypatch.setattr(
+        "app.scraper.load_institutions_config",
+        lambda: [{"name": "Test", "workday_url": "https://example.test/jobs"}],
+    )
+    monkeypatch.setattr(
+        "app.scraper.collect_listing_metadata",
+        lambda _cfg: (_ for _ in ()).throw(RuntimeError("unexpected response")),
+    )
+
+    result = run_scrape(["Test"])
+
+    assert result["success"] is False
+    assert result["institutions"][0]["status"] == "collection_exception"
+    assert result["institutions"][0]["error"] == "unexpected response"
 
 
 def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
