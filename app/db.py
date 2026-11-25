@@ -1,6 +1,7 @@
 # app/db.py
 
 import sqlite3
+from contextlib import contextmanager
 from datetime import date
 from app.config import JOBS_DB_PATH, SQLITE_TIMEOUT
 
@@ -9,6 +10,22 @@ def _connect():
     conn = sqlite3.connect(JOBS_DB_PATH, timeout=SQLITE_TIMEOUT)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+@contextmanager
+def transaction():
+    """Yield one SQLite transaction and roll back the entire unit on failure."""
+
+    conn = _connect()
+    try:
+        conn.execute("BEGIN")
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def get_all_jobs():
@@ -122,8 +139,36 @@ def insert_job_posting(
     questionnaire_id: str,
     salary_low: float,
     salary_high: float,
+    conn=None,
 ):
-    conn = _connect()
+    if conn is None:
+        with transaction() as transaction_conn:
+            return insert_job_posting(
+                company,
+                workday_id,
+                title,
+                job_description,
+                location,
+                url,
+                posted_on,
+                start_date,
+                time_type,
+                job_req_id,
+                job_posting_id,
+                job_posting_site_id,
+                country,
+                logo_image,
+                can_apply,
+                posted,
+                include_resume_parsing,
+                job_requisition_location,
+                remote_type,
+                questionnaire_id,
+                salary_low,
+                salary_high,
+                conn=transaction_conn,
+            )
+
     conn.execute(
         """
         INSERT INTO job_postings (
@@ -177,11 +222,9 @@ def insert_job_posting(
             salary_high,
         ),
     )
-    conn.commit()
-    conn.close()
 
 
-def delete_job_posting(company, workday_id=None, job_req_id=None):
+def delete_job_posting(company, workday_id=None, job_req_id=None, conn=None):
     """Delete a job posting for a company by identifier.
 
     Args:
@@ -201,10 +244,33 @@ def delete_job_posting(company, workday_id=None, job_req_id=None):
     column = "workday_id" if workday_id is not None else "job_req_id"
     value = workday_id if workday_id is not None else job_req_id
 
-    conn = _connect()
+    if conn is None:
+        with transaction() as transaction_conn:
+            return delete_job_posting(
+                company,
+                workday_id=workday_id,
+                job_req_id=job_req_id,
+                conn=transaction_conn,
+            )
+
     conn.execute(
         f"DELETE FROM job_postings WHERE company = ? AND {column} = ?",
         (company, value),
     )
-    conn.commit()
-    conn.close()
+
+
+def apply_company_diff(company, new_jobs, deleted_req_ids):
+    """Persist one company's validated diff atomically.
+
+    ``new_jobs`` must already have passed scraper-side completeness validation.
+    Any insert, delete, or SQLite constraint failure rolls back all mutations for
+    the company before it can affect the next institution.
+    """
+
+    with transaction() as conn:
+        for job in new_jobs:
+            insert_job_posting(company, conn=conn, **job)
+        for req_id in deleted_req_ids:
+            delete_job_posting(company, job_req_id=req_id, conn=conn)
+
+    return {"inserted": len(new_jobs), "deleted": len(deleted_req_ids)}
