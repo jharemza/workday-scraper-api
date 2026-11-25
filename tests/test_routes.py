@@ -1,6 +1,7 @@
 import pytest
 import app.config as config
 import app.db as db
+from app.scraper_pkg.institution_runner import CollectionResult, CollectionStatus
 
 pytest.importorskip("flask")
 
@@ -57,7 +58,10 @@ def test_scrape_route(client, monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         "app.scraper.collect_listing_metadata",
-        lambda cfg: {"REQ1": "http://example.com/job/REQ1"},
+        lambda cfg: CollectionResult(
+            CollectionStatus.SUCCESSFUL_NONEMPTY,
+            {"REQ1": "http://example.com/job/REQ1"},
+        ),
     )
 
     def fake_fetch(urls):

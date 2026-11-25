@@ -2,6 +2,8 @@ import app.db as db
 import app.config as config
 from app.scraper import run_scrape
 from app.scraper_pkg.institution_runner import (
+    CollectionResult,
+    CollectionStatus,
     collect_listing_metadata,
     fetch_job_details,
 )
@@ -77,9 +79,10 @@ def test_collect_listing_metadata(monkeypatch):
         "locations": [],
     }
 
-    metadata = collect_listing_metadata(inst)
+    result = collect_listing_metadata(inst)
 
-    assert metadata == {
+    assert result.status is CollectionStatus.SUCCESSFUL_NONEMPTY
+    assert result.metadata == {
         "REQ1": "http://example.com/job/REQ1",
         "REQ2": "http://example.com/job/REQ2",
     }
@@ -121,9 +124,10 @@ def test_collect_listing_metadata_first_rand_fallback(monkeypatch):
         "locations": [],
     }
 
-    metadata = collect_listing_metadata(inst)
+    result = collect_listing_metadata(inst)
 
-    assert metadata == {
+    assert result.status is CollectionStatus.SUCCESSFUL_NONEMPTY
+    assert result.metadata == {
         "REQ3": "http://example.com/job/REQ3",
         "REQ4_ONLY": "http://example.com/job/REQ4",
     }
@@ -159,9 +163,10 @@ def test_collect_listing_metadata_raymond_james(monkeypatch):
         "locations": [],
     }
 
-    metadata = collect_listing_metadata(inst)
+    result = collect_listing_metadata(inst)
 
-    assert metadata == {"REQRJ": "http://example.com/job/REQRJ"}
+    assert result.status is CollectionStatus.SUCCESSFUL_NONEMPTY
+    assert result.metadata == {"REQRJ": "http://example.com/job/REQRJ"}
 
 
 def test_fetch_job_details(monkeypatch):
@@ -254,7 +259,9 @@ def test_run_scrape_db_ops(monkeypatch, tmp_path):
     ]
 
     def fake_collect(_cfg):
-        return metadata_runs.pop(0)
+        return CollectionResult(
+            CollectionStatus.SUCCESSFUL_NONEMPTY, metadata_runs.pop(0)
+        )
 
     def fake_fetch(urls):
         jobs = []
@@ -305,7 +312,10 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
     }
 
     monkeypatch.setattr(
-        "app.scraper.collect_listing_metadata", lambda _cfg: scraped_map
+        "app.scraper.collect_listing_metadata",
+        lambda _cfg: CollectionResult(
+            CollectionStatus.SUCCESSFUL_NONEMPTY, scraped_map
+        ),
     )
     monkeypatch.setattr("app.scraper.get_existing_job_ids", lambda _company: {"REQ1"})
 
@@ -337,10 +347,12 @@ def test_run_scrape_skipped_matches_jobs_minus_inserted(monkeypatch):
 
 
 def test_collect_listing_metadata_facets_error(monkeypatch):
-    """If the initial POST request fails, an empty dict should be returned."""
+    """A transport error is non-authoritative, never an empty listing."""
+
+    import requests
 
     def fail_post(*_args, **_kwargs):
-        raise Exception("boom")
+        raise requests.ConnectionError("boom")
 
     monkeypatch.setattr(runner.requests, "post", fail_post)
 
@@ -351,5 +363,6 @@ def test_collect_listing_metadata_facets_error(monkeypatch):
         "locations": [],
     }
 
-    metadata = collect_listing_metadata(inst)
-    assert metadata == {}
+    result = collect_listing_metadata(inst)
+    assert result.status is CollectionStatus.NETWORK_FAILURE
+    assert result.metadata == {}

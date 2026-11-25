@@ -33,11 +33,28 @@ This repository powers a scalable Workday job scraping and automation pipeline v
 - Use `pytest` as the test runner
 - Maintain test coverage for all public methods
 - Use `requests-mock` or `unittest.mock` to isolate external calls
+- Add or update regression tests for every changed behavior, including changes
+  to return types, control flow, or downstream side effects.
+- For HTTP, network, JSON, parsing, validation, and other defensive paths,
+  test both the failure outcome and the fail-closed behavior at the caller.
+  Do not treat an error response as an authoritative empty result.
 - Run all tests before submitting changes:
 
 ```bash
-pytest --cov=.
+pytest --cov=app --cov-report=xml
 ```
+
+- For changed modules with defensive branches, also run focused coverage with
+  missing-line output and add tests for uncovered changed lines:
+
+```bash
+pytest -q tests/<relevant_test_file>.py --cov=<changed_module> --cov-report=term-missing
+```
+
+- Do not lower Codecov thresholds, exclude changed code from coverage, or
+  disable coverage reporting merely to satisfy a check. Treat a failing
+  `codecov/patch` result as missing regression coverage unless an actual
+  configuration defect has been separately approved for correction.
 
 ## Migration Context
 
@@ -55,8 +72,15 @@ Agents should not hard-code logic for a specific employer. Instead, all customiz
 Before finalizing a pull request:
 
 - [ ] Run flake8 with no errors
-- [ ] Run black . with no changes
-- [ ] Run pytest --cov=. and verify no test failures
+- [ ] Run `black --check app tests` with no formatting changes required
+- [ ] Run `pytest --cov=app --cov-report=xml` and verify no test failures
+- [ ] Run focused missing-line coverage for changed defensive code and cover
+      the changed error-handling branches
+- [ ] Run `git diff --check` with no whitespace errors
+- [ ] Push the feature branch and verify every required GitHub Actions check
+      and `codecov/patch` check passes before declaring Git delivery complete
+- [ ] If checks are pending or failing, report that state and keep the PR open;
+      do not claim delivery is complete until the required checks are green
 
 ## How Agents Should Work
 

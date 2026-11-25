@@ -13,6 +13,8 @@ import time
 import re
 from tqdm import tqdm
 import math
+from dataclasses import dataclass, field
+from enum import Enum
 import app.config as config
 
 
@@ -105,6 +107,67 @@ def log_with_prefix(level, company_name, message):
     getattr(logging, level)(f"[{company_name}] {message}")
 
 
+class CollectionStatus(str, Enum):
+    """Whether listing metadata can safely drive a destructive diff."""
+
+    VALID_EMPTY = "valid_empty"
+    SUCCESSFUL_NONEMPTY = "successful_nonempty"
+    UNMATCHED_LOCATION = "unmatched_location"
+    HTTP_FAILURE = "http_failure"
+    NETWORK_FAILURE = "network_failure"
+    PARSE_FAILURE = "parse_failure"
+
+
+@dataclass(frozen=True)
+class CollectionResult:
+    """Authoritative listing metadata or a fail-closed collection outcome."""
+
+    status: CollectionStatus
+    metadata: dict[str, str] = field(default_factory=dict)
+    error: str | None = None
+
+    @property
+    def is_authoritative(self) -> bool:
+        return self.status in {
+            CollectionStatus.VALID_EMPTY,
+            CollectionStatus.SUCCESSFUL_NONEMPTY,
+        }
+
+
+def _post_json(url, payload, company_name, request_name):
+    """POST and decode a JSON object, never reusing a failed response."""
+
+    try:
+        response = requests.post(
+            url, json=payload, headers={"Content-Type": "application/json"}
+        )
+        response.raise_for_status()
+    except requests.HTTPError as exc:
+        message = f"{request_name} HTTP failure: {exc}"
+        log_with_prefix("error", company_name, message)
+        return None, CollectionStatus.HTTP_FAILURE, message
+    except requests.RequestException as exc:
+        message = f"{request_name} network failure: {exc}"
+        log_with_prefix("error", company_name, message)
+        return None, CollectionStatus.NETWORK_FAILURE, message
+
+    try:
+        body = response.json()
+    except ValueError as exc:
+        message = f"{request_name} JSON parse failure: {exc}"
+        log_with_prefix("error", company_name, message)
+        return None, CollectionStatus.PARSE_FAILURE, message
+
+    if not isinstance(body, dict):
+        message = (
+            f"{request_name} JSON root must be an object, " f"got {type(body).__name__}"
+        )
+        log_with_prefix("error", company_name, message)
+        return None, CollectionStatus.PARSE_FAILURE, message
+
+    return body, None, None
+
+
 def collect_listing_metadata(cfg):
     """
     Collect listing metadata (req_id → URL) for a single institution.
@@ -113,7 +176,9 @@ def collect_listing_metadata(cfg):
     job postings, applying optional location filters.
 
     Returns:
-        dict[str, str]: Map of req_id → job URL.
+        CollectionResult: An authoritative valid-empty/nonempty result, or a
+        non-authoritative failure/unmatched-location result.  Callers must not
+        compute inserts or deletions from a non-authoritative result.
     """
 
     # 1. Set local vars from config
@@ -132,16 +197,17 @@ def collect_listing_metadata(cfg):
         "searchText": "",
     }
 
-    try:
-        response = requests.post(
-            url, json=initial_payload, headers={"Content-Type": "application/json"}
-        )
-        response.raise_for_status()
-    except Exception as e:
-        log_with_prefix("error", company_name, f"Failed to fetch facets: {e}")
-        return {}
+    facet_data, failure_status, error = _post_json(
+        url, initial_payload, company_name, "Facet request"
+    )
+    if failure_status:
+        return CollectionResult(failure_status, error=error)
+    if "facets" not in facet_data or not isinstance(facet_data["facets"], list):
+        message = "Facet response must contain a list-valued 'facets' field"
+        log_with_prefix("error", company_name, message)
+        return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
 
-    facets = response.json().get("facets", [])
+    facets = facet_data["facets"]
     location_ids = []
 
     if locations:
@@ -160,7 +226,7 @@ def collect_listing_metadata(cfg):
             company_name,
             "No valid location IDs matched descriptors. Skipping.",
         )
-        return {}
+        return CollectionResult(CollectionStatus.UNMATCHED_LOCATION)
 
     # 3. Job collection
 
@@ -181,18 +247,36 @@ def collect_listing_metadata(cfg):
         "searchText": search_text,
     }
 
-    try:
-        response = requests.post(
-            url, json=job_payload, headers={"Content-Type": "application/json"}
-        )
-        response.raise_for_status()
-    except Exception as e:
-        log_with_prefix("error", company_name, f"Pagination request failed: {e}")
-
-    # Compute how many pages to expect
-    data = response.json()
-    jobs_first_batch = data.get("jobPostings", [])
-    total = data.get("total", 0)
+    data, failure_status, error = _post_json(
+        url, job_payload, company_name, "Initial listing request"
+    )
+    if failure_status:
+        return CollectionResult(failure_status, error=error)
+    if "jobPostings" not in data or "total" not in data:
+        message = "Initial listing response requires 'jobPostings' and 'total'"
+        log_with_prefix("error", company_name, message)
+        return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
+    jobs_first_batch = data["jobPostings"]
+    total = data["total"]
+    if (
+        not isinstance(jobs_first_batch, list)
+        or isinstance(total, bool)
+        or not isinstance(total, int)
+        or total < 0
+    ):
+        message = "Initial listing response has invalid 'jobPostings' or 'total' types"
+        log_with_prefix("error", company_name, message)
+        return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
+    if total == 0:
+        if jobs_first_batch:
+            message = "Initial listing response has total=0 with nonempty jobPostings"
+            log_with_prefix("error", company_name, message)
+            return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
+        return CollectionResult(CollectionStatus.VALID_EMPTY)
+    if not jobs_first_batch:
+        message = "Initial listing response has positive total with empty jobPostings"
+        log_with_prefix("error", company_name, message)
+        return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
     total_pages = math.ceil(total / limit)
 
     log_with_prefix("info", company_name, f"Total job postings found: {total}")
@@ -204,7 +288,11 @@ def collect_listing_metadata(cfg):
     )
 
     def extract_req_id(job_posting):
+        if not isinstance(job_posting, dict):
+            raise ValueError("jobPostings entries must be objects")
         bullet_fields = job_posting.get("bulletFields") or []
+        if not isinstance(bullet_fields, list):
+            raise ValueError("jobPosting bulletFields must be a list when present")
 
         if company_name == "First Rand" and len(bullet_fields) > 2:
             return bullet_fields[2] or (bullet_fields[0] if bullet_fields else None)
@@ -213,50 +301,60 @@ def collect_listing_metadata(cfg):
 
         return bullet_fields[0] if bullet_fields else None
 
-    # Collect URLs from first batch
-    for job in jobs_first_batch:
-        req_id = extract_req_id(job)
-
-        ext_path = job.get("externalPath", "")
-        if req_id and ext_path:
-            job_url = f"{url.rsplit('/jobs', 1)[0]}/job/{ext_path.split('/')[-1]}"
-            scraped_map[req_id] = job_url
-
-    page_pbar.update(1)
-    offset += limit
-
-    # Loop through the *remaining* pages
-    while page_pbar.n < total_pages:
-
-        job_payload = {
-            "limit": limit,
-            "offset": offset,
-            "appliedFacets": applied_facets,
-            "searchText": search_text,
-        }
-
-        try:
-            response = requests.post(
-                url, json=job_payload, headers={"Content-Type": "application/json"}
-            )
-            response.raise_for_status()
-        except Exception as e:
-            log_with_prefix("error", company_name, f"Pagination request failed: {e}")
-            break
-
-        jobs = response.json().get("jobPostings", [])
-
+    def collect_batch(jobs):
         for job in jobs:
             req_id = extract_req_id(job)
-
             ext_path = job.get("externalPath", "")
+            if ext_path and not isinstance(ext_path, str):
+                raise ValueError(
+                    "jobPosting externalPath must be a string when present"
+                )
             if req_id and ext_path:
                 job_url = f"{url.rsplit('/jobs', 1)[0]}/job/{ext_path.split('/')[-1]}"
                 scraped_map[req_id] = job_url
 
-        offset += limit
+    try:
+        collect_batch(jobs_first_batch)
         page_pbar.update(1)
-        time.sleep(config.SCRAPER_LISTING_DELAY_SECONDS)
+        offset += limit
+
+        # Loop through the remaining pages. Any failed page invalidates the
+        # full listing result so downstream deletion cannot run on a partial map.
+        while page_pbar.n < total_pages:
+            job_payload = {
+                "limit": limit,
+                "offset": offset,
+                "appliedFacets": applied_facets,
+                "searchText": search_text,
+            }
+            page_data, failure_status, error = _post_json(
+                url, job_payload, company_name, "Pagination request"
+            )
+            if failure_status:
+                return CollectionResult(failure_status, error=error)
+            if "jobPostings" not in page_data or not isinstance(
+                page_data["jobPostings"], list
+            ):
+                message = (
+                    "Pagination response requires a list-valued " "'jobPostings' field"
+                )
+                log_with_prefix("error", company_name, message)
+                return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
+            collect_batch(page_data["jobPostings"])
+            offset += limit
+            page_pbar.update(1)
+            time.sleep(config.SCRAPER_LISTING_DELAY_SECONDS)
+    except ValueError as exc:
+        message = f"Listing response field validation failure: {exc}"
+        log_with_prefix("error", company_name, message)
+        return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
+    finally:
+        page_pbar.close()
+
+    if not scraped_map:
+        message = "Positive listing total produced no usable requisition metadata"
+        log_with_prefix("error", company_name, message)
+        return CollectionResult(CollectionStatus.PARSE_FAILURE, error=message)
 
     sm_count = len(scraped_map)
     msg = f"Total job URLs collected: {sm_count}"
@@ -265,9 +363,7 @@ def collect_listing_metadata(cfg):
     log_with_prefix("info", company_name, msg)
     log_with_prefix("info", company_name, f"Total pages scraped: {page_pbar.n}")
 
-    page_pbar.close()
-
-    return scraped_map
+    return CollectionResult(CollectionStatus.SUCCESSFUL_NONEMPTY, scraped_map)
 
 
 def fetch_job_details(urls):
