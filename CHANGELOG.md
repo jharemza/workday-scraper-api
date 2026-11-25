@@ -6,6 +6,39 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.6.0](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.6.0) - 2026-11-25
+
+<small>[Compare with v0.5.1](https://github.com/jharemza/workday-scraper-api/compare/v0.5.1...v0.6.0)</small>
+
+### Features
+
+- report durable scrape outcomes ([289de14](https://github.com/jharemza/workday-scraper-api/commit/289de145f5c35541b2d5aa3437ad117a68d5e2a0) by Jeremiah Haremza).
+- make scraper persistence transactional ([2746be2](https://github.com/jharemza/workday-scraper-api/commit/2746be241ab48be295c5119e6f250bcf6e5277b6) by Jeremiah Haremza).
+- harden listing pagination and retries ([b8049c1](https://github.com/jharemza/workday-scraper-api/commit/b8049c16ad27fc61c01dc243093dc15cc03bab4d) by Jeremiah Haremza).
+
+### Bug Fixes
+
+- fail closed on listing collection errors ([b88ebf6](https://github.com/jharemza/workday-scraper-api/commit/b88ebf6568513cf9fd805c17d40f2249319cec42) by Jeremiah Haremza).
+
+### Chore
+
+- ignore local Codex configuration ([ad45cb9](https://github.com/jharemza/workday-scraper-api/commit/ad45cb93994d79fe5393b7bfe3274deccd8f3a19) by Jeremiah Haremza).
+
+### Docs
+
+- require defensive coverage before delivery ([0511423](https://github.com/jharemza/workday-scraper-api/commit/051142351441545c43beaf34aad23476b37ca285) by Jeremiah Haremza).
+- update changelog for v0.5.1 ([93bce09](https://github.com/jharemza/workday-scraper-api/commit/93bce09930d530b593390c945f5b4c0979d25e46) by github-actions[bot]).
+
+### Style
+
+- format collection error handling ([420f1f2](https://github.com/jharemza/workday-scraper-api/commit/420f1f25a060c59bfb04d98c8c99083399bb1185) by Jeremiah Haremza).
+- satisfy collection error lint checks ([0a050a6](https://github.com/jharemza/workday-scraper-api/commit/0a050a62ccc8e112d16b921360296c757c29b941) by Jeremiah Haremza).
+
+### Tests
+
+- cover transactional persistence guards ([3bf2016](https://github.com/jharemza/workday-scraper-api/commit/3bf2016eca031a8df06deb0cc517ce7af16d2b24) by Jeremiah Haremza).
+- cover fail-closed listing branches ([27432ea](https://github.com/jharemza/workday-scraper-api/commit/27432eadc0ffddb860af90dc9fc4138f1b5c93b0) by Jeremiah Haremza).
+
 ## [v0.5.1](https://github.com/jharemza/workday-scraper-api/releases/tag/v0.5.1) - 2026-08-02
 
 <small>[Compare with v0.5.0](https://github.com/jharemza/workday-scraper-api/compare/v0.5.0...v0.5.1)</small>
