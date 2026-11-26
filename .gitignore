@@ -14,6 +14,7 @@ EOF
 .codex/
 
 # Log file output
+logs/
 logs/*.log
 
 # Database files

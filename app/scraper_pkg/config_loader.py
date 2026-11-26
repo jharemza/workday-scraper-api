@@ -1,5 +1,6 @@
 import yaml
-import app.config as config
+
+from app import config
 
 
 def load_institutions_config(path: str | None = None):
