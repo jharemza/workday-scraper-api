@@ -245,7 +245,7 @@ def collect_listing_metadata(cfg):
     # 1. Set local vars from config
     company_name = cfg["name"]
     url = cfg["workday_url"]
-    locations = cfg.get("locations", [])
+    locations = cfg.get("locations")
     search_text = cfg["search_text"]
 
     log_with_prefix("info", company_name, "🏁 Starting metadata collection.")
@@ -272,36 +272,40 @@ def collect_listing_metadata(cfg):
             duplicate_requisition_ids=tuple(sorted(duplicates)),
         )
 
-    # 2. Initial fetch for facets
-    initial_payload = {
-        "limit": config.FACET_LIMIT,
-        "offset": 0,
-        "appliedFacets": {},
-        "searchText": "",
-    }
-
-    facet_data, failure_status, error = _post_json(
-        url, initial_payload, company_name, "Facet request", request_budget
-    )
-    if failure_status:
-        return failed(failure_status, error, stage="facets")
-    if "facets" not in facet_data or not isinstance(facet_data["facets"], list):
-        message = "Facet response must contain a list-valued 'facets' field"
-        log_with_prefix("error", company_name, message)
-        return failed(CollectionStatus.PARSE_FAILURE, message, stage="facets")
-
-    facets = facet_data["facets"]
     location_ids = []
+    if locations is not None:
+        # Only institutions with configured location descriptors need a separate
+        # facet-discovery request. Otherwise the first provider request should
+        # be the actual configured listing query.
+        initial_payload = {
+            "limit": config.FACET_LIMIT,
+            "offset": 0,
+            "appliedFacets": {},
+            "searchText": "",
+        }
 
-    if locations:
-        for loc in tqdm(locations, desc=f"{company_name}: Location facets", unit="loc"):
-            facet_param, loc_id = find_id_by_descriptor(facets, loc)
-            if loc_id:
-                location_ids.append(loc_id)
-            else:
-                log_with_prefix(
-                    "error", company_name, f"Location '{loc}' not found in facets."
-                )
+        facet_data, failure_status, error = _post_json(
+            url, initial_payload, company_name, "Facet request", request_budget
+        )
+        if failure_status:
+            return failed(failure_status, error, stage="facets")
+        if "facets" not in facet_data or not isinstance(facet_data["facets"], list):
+            message = "Facet response must contain a list-valued 'facets' field"
+            log_with_prefix("error", company_name, message)
+            return failed(CollectionStatus.PARSE_FAILURE, message, stage="facets")
+
+        facets = facet_data["facets"]
+        if locations:
+            for loc in tqdm(
+                locations, desc=f"{company_name}: Location facets", unit="loc"
+            ):
+                facet_param, loc_id = find_id_by_descriptor(facets, loc)
+                if loc_id:
+                    location_ids.append(loc_id)
+                else:
+                    log_with_prefix(
+                        "error", company_name, f"Location '{loc}' not found in facets."
+                    )
 
     if locations and not location_ids:
         log_with_prefix(
